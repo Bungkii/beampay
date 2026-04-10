@@ -14,7 +14,7 @@
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #print-qr-slip, #print-receipt-slip { display: none; }
-        .paper-feed { height: 70px; } /* สำหรับดึงกระดาษ Sunmi */
+        .paper-feed { height: 70px; } 
 
         @media print {
             @page { margin: 0; size: 58mm auto; }
@@ -29,7 +29,7 @@
 
     <div id="screen-keypad" class="flex flex-col h-full bg-white w-full max-w-md shadow-2xl relative">
         <div class="bg-[#1e3a8a] text-white text-center py-6 shadow-md">
-            <h2 class="font-bold text-2xl tracking-widest uppercase"ชำระเงินผ่าน QR Payment</h2>
+            <h2 class="font-bold text-2xl tracking-widest uppercase">ชำระเงินผ่าน QR Payment</h2>
         </div>
         <div class="px-10 py-12 flex flex-col justify-end items-end bg-slate-50 flex-none h-1/4 border-b">
             <span class="text-slate-400 font-bold mb-1 w-full text-left text-xs uppercase tracking-widest">ยอดเงิน (THB)</span>
@@ -58,7 +58,7 @@
             <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">QR PAYMENT</div>
         </div>
         <div class="flex-1 flex flex-col items-center p-6 overflow-y-auto">
-            <img src="src/promptpay.webp" class="h-8 mb-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png" class="h-8 mb-6">
             
             <div id="qr-container" class="mb-6 border-4 border-slate-50 p-2 rounded-[2rem] bg-white shadow-xl active:scale-95 transition-transform" onclick="printQR()">
                 <div class="w-[260px] h-[260px] flex items-center justify-center bg-slate-50 rounded-2xl animate-pulse text-slate-300 text-sm">กำลังสร้าง QR...</div>
@@ -94,7 +94,7 @@
         <div class="flex-1 p-6 flex flex-col items-center bg-gray-50">
             <div class="bg-white p-8 shadow-xl rounded-3xl border w-full mb-8 flex flex-col items-center text-center">
                 <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                <h3 class="font-bold text-lg text-slate-800 uppercase">ยอดเงินที่ต้องชำระ</h3>
+                <h3 class="font-bold text-lg text-slate-800 uppercase">ยอดเงินที่ได้รับชำระ</h3>
                 <p id="r-amount-display" class="text-5xl font-bold text-gray-900 my-6 tracking-tighter">0.00</p>
                 <div class="w-full border-t border-dashed border-gray-200 pt-6 text-[12px] text-gray-400 space-y-2 text-left">
                     <p class="flex justify-between"><span>MID:</span><span id="r-mid-ui">--</span></p>
@@ -102,15 +102,15 @@
                 </div>
             </div>
             <button class="w-full bg-[#1e3a8a] text-white font-bold py-6 rounded-2xl text-lg shadow-xl mb-4 active:scale-95 transition-all" onclick="printReceipt()">พิมพ์ใบเสร็จ (Merchant Copy)</button>
-            <button class="w-full bg-white border text-slate-400 font-bold py-4 rounded-2xl" onclick="resetApp()">ทำรายการใหม่</button>
+            <button class="w-full bg-white border text-slate-400 font-bold py-4 rounded-2xl" onclick="resetApp()">กลับหน้าหลัก</button>
         </div>
     </div>
 
     <div id="screen-failed" class="hidden flex-col h-full bg-slate-100 items-center justify-center p-4 w-full">
         <div class="bg-white p-10 shadow-2xl w-full max-w-[360px] rounded-[3rem] text-center flex flex-col items-center">
-            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6"><img src="src/payment_failed.2b608957.svg" class="w-16 h-16" onerror="this.src='https://cdn-icons-png.flaticon.com/512/753/753345.png'"></div>
+            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6"><img src="https://cdn-icons-png.flaticon.com/512/753/753345.png" class="w-16 h-16"></div>
             <h3 class="font-bold text-2xl mb-2 text-red-600 uppercase">Decline</h3>
-            <p id="error-message" class="text-slate-500 text-sm mb-10 leading-relaxed px-4">ยอดเงินไม่ถูกต้องหรือต่ำกว่าขั้นต่ำ</p>
+            <p id="error-message" class="text-slate-500 text-sm mb-10 leading-relaxed px-4">เกิดข้อผิดพลาดในการสร้างรายการ</p>
             <button class="w-full bg-[#0a1b4d] text-white font-bold py-5 rounded-3xl text-lg shadow-lg active:scale-95" onclick="resetApp()">กลับหน้าหลัก</button>
             <div class="mt-8 text-[10px] text-gray-300 font-mono tracking-widest uppercase">ERROR: <span id="error-code-display">BEAM-400</span></div>
         </div>
@@ -119,7 +119,6 @@
     <div id="print-qr-slip" class="receipt-font">
         <div style="font-weight:bold; font-size:14px; text-align:center;">ชำระเงินผ่าน QR Promptpay</div>
         <div style="text-align:center;">==========================</div>
-        <div style="display:flex; justify-content:center; margin:10px 0;"><img src="src/promptpay.webp" style="height:32px;"></div>
         <div id="qr-print-img" style="display:flex; justify-content:center; margin:10px 0;"></div>
         <div style="text-align:center;">==========================</div>
         <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px;"><span>ยอดรวม</span><span id="p-amount-qr"></span></div>
@@ -128,7 +127,7 @@
     </div>
 
     <div id="print-receipt-slip" class="receipt-font">
-        <div style="text-align:center; font-weight:bold; font-size:15px;">-- Cashless Payment Information --</div>
+        <div style="text-align:center; font-weight:bold; font-size:15px;">-- Cashless Payment --</div>
         <div style="text-align:center;">==========================</div>
         <div style="display:flex; justify-content:space-between;"><span>MID:</span><span id="p-mid">--</span></div>
         <div style="display:flex; justify-content:space-between;"><span>REF #:</span><span id="p-ref">--</span></div>
@@ -179,10 +178,9 @@
                 const base64QR = `data:image/png;base64,${data.encodedImage}`;
                 document.getElementById('qr-container').innerHTML = `<img src="${base64QR}" class="w-full h-full object-contain rounded-xl">`;
                 document.getElementById('qr-print-img').innerHTML = `<img src="${base64QR}" style="width:48mm; height:48mm;">`;
-                document.getElementById('r-mid-ui').innerText = data.mid;
-                document.getElementById('p-mid').innerText = data.mid;
+                document.getElementById('r-mid-ui').innerText = data.mid || "N/A";
+                document.getElementById('p-mid').innerText = data.mid || "N/A";
 
-                // 🟢 เริ่ม Auto Polling
                 pollingInterval = setInterval(() => checkStatus(false), 3000);
             } catch (e) { 
                 document.getElementById('error-message').innerText = e.message;
@@ -195,7 +193,6 @@
             try {
                 const res = await fetch(`/api/check-status?id=${currentChargeId}`);
                 const data = await res.json();
-                
                 const status = data.status ? data.status.toUpperCase() : "";
 
                 if (status === 'SUCCEEDED' || status === 'SUCCESSFUL') {
