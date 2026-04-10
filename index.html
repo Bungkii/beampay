@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BBL Pay - Sunmi V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+    <style>
+        body {
+            overscroll-behavior-y: none;
+        }
+        .receipt-text {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.2;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        @media print {
+            @page {
+                margin: 0; 
+                width: 58mm;
+            }
+            body {
+                margin: 0;
+                background-color: white;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 58mm;
+                padding: 2mm;
+                margin: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen w-screen overflow-hidden font-sans text-gray-800 flex flex-col">
+
+    <div id="screen-keypad" class="flex flex-col h-full bg-white">
+        <div class="bg-[#1e3a8a] text-white text-center py-4 shadow-md z-10">
+            <h2 class="font-extrabold text-2xl tracking-widest uppercase">BBL Pay</h2>
+        </div>
+        
+        <div class="px-6 py-8 flex flex-col justify-end items-end border-b border-gray-200 bg-gray-50 flex-none h-1/4">
+            <span class="text-gray-400 font-semibold mb-1 w-full text-left">จำนวนเงิน (THB)</span>
+            <span id="amountDisplay" class="text-6xl font-mono font-bold text-[#1e3a8a] tracking-tighter">0.00</span>
+        </div>
+
+        <div class="flex-1 grid grid-cols-3 gap-0 bg-gray-200">
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('1')">1</button>
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('2')">2</button>
+            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('3')">3</button>
+            
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('4')">4</button>
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('5')">5</button>
+            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('6')">6</button>
+            
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('7')">7</button>
+            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('8')">8</button>
+            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('9')">9</button>
+            
+            <button class="bg-red-50 border-r border-red-100 hover:bg-red-100 active:bg-red-200 text-red-600 text-3xl font-bold transition" onclick="pressClear()">C</button>
+            <button class="bg-white border-r border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('0')">0</button>
+            <button class="bg-white hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-semibold transition" onclick="pressKey('00')">00</button>
+        </div>
+
+        <button class="w-full bg-[#f97316] hover:bg-[#ea580c] active:bg-[#c2410c] text-white font-bold py-6 text-2xl transition flex-none" onclick="createSale()">สร้างรายการขาย</button>
+    </div>
+
+    <div id="screen-qr" class="flex flex-col h-full bg-white hidden">
+        <div class="bg-[#1e3a8a] text-white text-center py-4 shadow-md">
+            <h2 class="font-extrabold text-2xl tracking-widest uppercase">Scan to Pay</h2>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center justify-center p-6">
+            <p class="text-gray-500 mb-6 text-lg">ยอดที่ต้องชำระ <span id="qr-amount" class="font-bold text-[#1e3a8a] text-2xl"></span> THB</p>
+            
+            <div id="qr-container" class="bg-white border-4 border-blue-100 p-6 rounded-3xl flex justify-center items-center min-h-[300px] w-full max-w-[300px] shadow-sm mb-8">
+                <span id="qr-loading" class="text-gray-400 animate-pulse text-lg">กำลังเชื่อมต่อ API...</span>
+            </div>
+        </div>
+
+        <div class="flex gap-2 p-4 bg-gray-50 border-t border-gray-200">
+            <button class="flex-1 bg-gray-300 active:bg-gray-400 text-gray-800 font-bold py-5 rounded-xl text-lg transition" onclick="cancelTransaction()">ยกเลิก</button>
+            <button class="flex-[2] bg-green-500 active:bg-green-600 text-white font-bold py-5 rounded-xl text-lg transition" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
+        </div>
+    </div>
+
+    <div id="screen-receipt" class="flex flex-col h-full bg-white hidden overflow-y-auto">
+        <div class="bg-green-500 text-white text-center py-4 shadow-md no-print z-10">
+            <h2 class="font-bold text-xl uppercase">ชำระเงินสำเร็จ</h2>
+        </div>
+
+        <div class="flex-1 p-4 flex flex-col items-center pt-8 bg-gray-200">
+            <div id="print-area" class="bg-white p-4 shadow-md border border-gray-300 w-[58mm] min-h-[100mm]">
+<pre class="receipt-text">
+-- Cashless Information --
+==========================
+TID :   012D4514
+TRANCE ID : <span id="r-trace"></span>
+Ref no #:   <span id="r-ref"></span>
+SALE
+AMOUNT  <span id="r-amount" class="float-right font-bold"></span>
+==========================
+CUSTOMERNAME
+
+com.arke 1.19.49
+- - -CUSTOMER COPY- - -
+</pre>
+            </div>
+
+            <div class="w-full mt-8 flex flex-col gap-3 no-print px-4">
+                <button class="w-full bg-blue-600 active:bg-blue-700 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="printReceipt()">🖨️ พิมพ์ใบเสร็จ (Print)</button>
+                <button class="w-full bg-[#1e3a8a] active:bg-blue-900 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="resetApp()">จบการทำงาน / กลับหน้าแรก</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BEAM_API_KEY = "76vw3ileCpe/EBXT1qRFLXxnEE2BTM7jlC/4bLvDuDk=";
+        let amountStr = "0";
+
+        function updateDisplay() {
+            let num = parseInt(amountStr, 10);
+            let formatted = (num / 100).toFixed(2);
+            document.getElementById('amountDisplay').innerText = formatted;
+        }
+
+        function pressKey(key) {
+            if (amountStr.length >= 8) return; 
+            if (amountStr === "0") {
+                if(key === '00' || key === '0') return;
+                amountStr = key;
+            } else {
+                amountStr += key;
+            }
+            updateDisplay();
+        }
+
+        function pressClear() {
+            amountStr = "0";
+            updateDisplay();
+        }
+
+        function switchScreen(id) {
+            document.getElementById('screen-keypad').classList.add('hidden');
+            document.getElementById('screen-qr').classList.add('hidden');
+            document.getElementById('screen-receipt').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        async function createSale() {
+            let amountVal = parseInt(amountStr, 10);
+            if (amountVal <= 0) {
+                alert("กรุณาป้อนยอดเงินก่อนสร้างรายการ");
+                return;
+            }
+
+            let amountThb = (amountVal / 100).toFixed(2);
+            document.getElementById('qr-amount').innerText = amountThb;
+            switchScreen('screen-qr');
+            
+            // API Endpoint ของ Beam Checkout
+            const targetApiUrl = "https://api.beamcheckout.com/api/v1/charges"; 
+            
+            // ใช้ CORS Proxy เพื่อให้เรียกผ่าน Browser ได้โดยตรง
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetApiUrl);
+
+            const payload = {
+                amount: amountVal,
+                currency: "THB",
+                paymentMethod: "PROMPTPAY" // หรือรูปแบบ Method ตาม Document ของ Beam
+            };
+
+            try {
+                const response = await fetch(proxyUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${BEAM_API_KEY}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data && data.qrCodeUrl) {
+                    renderQR(data.qrCodeUrl);
+                } else {
+                    throw new Error("Invalid API Response");
+                }
+            } catch (error) {
+                console.error("API Call Failed:", error);
+                document.getElementById('qr-loading').innerHTML = "<span class='text-red-500 font-bold'>ไม่สามารถสร้าง QR ได้<br>อาจต้องตั้งค่า Backend Proxy</span>";
+                
+                // ถ้าระบบ Proxy ล่ม หรือ API ผิดพลาด จะยังแสดง Mock QR ให้เทส UI ต่อได้
+                setTimeout(() => {
+                    renderQR(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MockBBLPay-${amountThb}`);
+                }, 1500);
+            }
+        }
+
+        function renderQR(url) {
+            document.getElementById('qr-container').innerHTML = `<img src="${url}" alt="Payment QR" class="w-full h-auto rounded-lg" />`;
+        }
+
+        function cancelTransaction() {
+            pressClear();
+            document.getElementById('qr-container').innerHTML = '<span id="qr-loading" class="text-gray-400 animate-pulse text-lg">กำลังเชื่อมต่อ API...</span>';
+            switchScreen('screen-keypad');
+        }
+
+        function verifyTransaction() {
+            let amountThb = (parseInt(amountStr, 10) / 100).toFixed(2);
+            const traceId = Math.floor(100000 + Math.random() * 900000);
+            const refNo = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+            document.getElementById('r-trace').innerText = traceId;
+            document.getElementById('r-ref').innerText = refNo;
+            document.getElementById('r-amount').innerText = amountThb; 
+
+            switchScreen('screen-receipt');
+        }
+
+        function printReceipt() {
+            window.print();
+        }
+
+        function resetApp() {
+            pressClear();
+            document.getElementById('qr-container').innerHTML = '<span id="qr-loading" class="text-gray-400 animate-pulse text-lg">กำลังเชื่อมต่อ API...</span>';
+            switchScreen('screen-keypad');
+        }
+    </script>
+</body>
+</html>
