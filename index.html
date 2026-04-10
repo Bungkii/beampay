@@ -3,459 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BBLEDC_Landi</title>
-    
+    <title>LandiEDC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        body {
-            font-family: 'IBM Plex Sans Thai', sans-serif;
-            overscroll-behavior-y: none;
-            background-color: #f3f4f6;
-        }
-
-        /* ฟอนต์ใบเสร็จ (Monospace ของระบบ) */
-        .receipt-font {
-            font-family: monospace; 
-            line-height: 1.2;
-            font-size: 13px;
-        }
-
-        /* Animation โหลดดิ้ง */
-        .loader {
-            border-top-color: #3b82f6;
-            animation: spinner 1.5s linear infinite;
-        }
-        @keyframes spinner {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ----- ระบบ CSS Print แยกส่วน ----- */
+        body { font-family: 'IBM Plex Sans Thai', sans-serif; overscroll-behavior-y: none; background-color: #f3f4f6; }
+        .receipt-font { font-family: monospace; line-height: 1.2; font-size: 13px; }
+        .loader { border-top-color: #3b82f6; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media print {
             @page { margin: 0; width: 58mm; }
             body { background: white; margin: 0; }
             body * { visibility: hidden; }
-
-            /* กรณีพิมพ์ QR Code */
-            body.printing-qr #print-qr-area, 
-            body.printing-qr #print-qr-area * {
-                visibility: visible;
-            }
-            body.printing-qr #print-qr-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 58mm;
-                padding: 2mm;
-                text-align: center;
-            }
-            body.printing-qr #qr-image {
-                width: 50mm !important;
-                height: auto !important;
-                margin: 0 auto;
-            }
-
-            /* กรณีพิมพ์ใบเสร็จ */
-            body.printing-receipt #print-receipt-area, 
-            body.printing-receipt #print-receipt-area * {
-                visibility: visible;
-            }
-            body.printing-receipt #print-receipt-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 58mm;
-                padding: 2mm;
-                margin: 0;
-            }
-            body.printing-receipt #void-barcode {
-                width: 100% !important;
-                max-width: 48mm;
-                height: auto !important;
-            }
-
-            .no-print { display: none !important; }
+            body.printing-qr #print-qr-area, body.printing-qr #print-qr-area * { visibility: visible; }
+            body.printing-qr #print-qr-area { position: absolute; left: 0; top: 0; width: 58mm; text-align: center; }
+            body.printing-receipt #print-receipt-area, body.printing-receipt #print-receipt-area * { visibility: visible; }
+            body.printing-receipt #print-receipt-area { position: absolute; left: 0; top: 0; width: 58mm; padding: 2mm; }
         }
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden text-gray-800 flex flex-col">
 
     <div id="screen-keypad" class="flex flex-col h-full bg-white relative z-10">
-        <div class="bg-[#1e3a8a] text-white text-center py-4 shadow-md z-10">
+        <div class="bg-[#1e3a8a] text-white text-center py-4 shadow-md">
             <h2 class="font-bold text-2xl tracking-widest uppercase">BBL Pay</h2>
         </div>
-        
-        <div class="px-6 py-8 flex flex-col justify-end items-end border-b border-gray-200 bg-gray-50 flex-none h-1/4">
+        <div class="px-6 py-8 flex flex-col justify-end items-end bg-gray-50 flex-none h-1/4 border-b">
             <span class="text-gray-400 font-medium mb-1 w-full text-left">จำนวนเงิน (THB)</span>
-            <span id="amountDisplay" class="text-6xl font-mono font-bold text-[#1e3a8a] tracking-tighter">0.00</span>
+            <span id="amountDisplay" class="text-6xl font-mono font-bold text-[#1e3a8a]">0.00</span>
         </div>
-
         <div class="flex-1 grid grid-cols-3 gap-0 bg-gray-200">
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('1')">1</button>
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('2')">2</button>
-            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('3')">3</button>
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('4')">4</button>
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('5')">5</button>
-            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('6')">6</button>
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('7')">7</button>
-            <button class="bg-white border-r border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('8')">8</button>
-            <button class="bg-white border-b border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('9')">9</button>
-            <button class="bg-red-50 border-r border-red-100 hover:bg-red-100 active:bg-red-200 text-red-600 text-3xl font-bold transition" onclick="pressClear()">C</button>
-            <button class="bg-white border-r border-gray-200 hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('0')">0</button>
-            <button class="bg-white hover:bg-blue-50 active:bg-blue-200 text-gray-700 text-3xl font-medium transition" onclick="pressKey('00')">00</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('1')">1</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('2')">2</button>
+            <button class="bg-white border-b text-3xl font-medium" onclick="pressKey('3')">3</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('4')">4</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('5')">5</button>
+            <button class="bg-white border-b text-3xl font-medium" onclick="pressKey('6')">6</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('7')">7</button>
+            <button class="bg-white border-r border-b text-3xl font-medium" onclick="pressKey('8')">8</button>
+            <button class="bg-white border-b text-3xl font-medium" onclick="pressKey('9')">9</button>
+            <button class="bg-red-50 border-r border-red-100 text-red-600 text-3xl font-bold" onclick="pressClear()">C</button>
+            <button class="bg-white border-r text-3xl font-medium" onclick="pressKey('0')">0</button>
+            <button class="bg-white text-3xl font-medium" onclick="pressKey('00')">00</button>
         </div>
-
-        <button class="w-full bg-[#f97316] hover:bg-[#ea580c] active:bg-[#c2410c] text-white font-bold py-6 text-2xl transition flex-none" onclick="createSale()">สร้างรายการขาย</button>
+        <button class="w-full bg-[#f97316] text-white font-bold py-6 text-2xl transition" onclick="createSale()">สร้างรายการขาย</button>
     </div>
 
     <div id="screen-qr" class="hidden flex-col h-full bg-black/40 items-center justify-center p-4">
-        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-[400px] overflow-hidden flex flex-col max-h-full relative">
-            
-            <div class="bg-[#f8f9fb] px-6 py-4 flex items-center relative shrink-0 border-b border-gray-100 no-print">
-                <button onclick="cancelTransaction()" class="absolute left-4 text-gray-500 hover:text-gray-800 flex items-center gap-1 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-[400px] overflow-hidden flex flex-col relative">
+            <div class="bg-[#f8f9fb] px-6 py-4 flex items-center relative border-b">
+                <button onclick="cancelTransaction()" class="absolute left-4 text-gray-500 flex items-center gap-1">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     <span class="text-[13px] font-semibold">กลับ</span>
                 </button>
-                <div class="flex-1 flex flex-col items-center text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                        <circle cx="12" cy="13" r="4"></circle>
-                    </svg>
-                    <p class="text-[#4b5563] text-[12px] font-medium leading-tight">แคปหน้าจอและสแกน QR<br>เพื่อชำระเงิน</p>
+                <div class="flex-1 flex flex-col items-center">
+                    <p class="text-[#4b5563] text-[12px] font-medium leading-tight text-center">แคปหน้าจอและสแกน QR<br>เพื่อชำระเงิน</p>
                 </div>
             </div>
-
-            <div id="print-qr-area" class="p-6 flex flex-col items-center overflow-y-auto bg-white">
-                <img src="src/promptpay.webp" alt="PromptPay" class="h-8 mb-6 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
-
-                <div class="relative group cursor-pointer mb-6" onclick="printQR()" title="คลิกเพื่อพิมพ์ QR">
-                    <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-20 transition-opacity rounded-2xl"></div>
-                    <div id="qr-container" class="border border-gray-200 rounded-2xl p-2 bg-white">
-                        <span id="qr-loading" class="text-gray-400 animate-pulse text-sm px-8 py-16 inline-block">กำลังสร้าง...</span>
-                    </div>
+            <div id="print-qr-area" class="p-6 flex flex-col items-center bg-white">
+                <img src="src/promptpay.webp" alt="PromptPay" class="h-8 mb-6 object-contain">
+                <div class="cursor-pointer mb-6" onclick="printQR()" id="qr-container">
+                    <span class="text-gray-400 animate-pulse text-sm px-8 py-16 inline-block">กำลังสร้าง...</span>
                 </div>
-
                 <div class="text-center mb-6">
                     <p class="text-gray-400 text-[13px] mb-1">ชำระเงินให้ บ้านสวนปัณณพัฒน์</p>
                     <div class="flex items-baseline justify-center gap-1">
-                        <span id="qr-amount" class="text-4xl font-bold text-gray-800 tracking-tight">0.00</span>
+                        <span id="qr-amount" class="text-4xl font-bold text-gray-800">0.00</span>
                         <span class="text-lg font-medium text-gray-400">บาท</span>
                     </div>
                 </div>
-
-                <div class="w-full space-y-3 no-print">
+                <div class="w-full space-y-3">
                     <div class="bg-amber-50 border border-amber-100 rounded-2xl py-3 px-4 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span class="text-amber-800 text-[12px] font-semibold">ชำระเงินภายใน <span id="timer">05:00</span></span>
-                        </div>
+                        <span class="text-amber-800 text-[12px] font-semibold">ชำระเงินภายใน <span id="timer">05:00</span></span>
                         <span id="display-date" class="text-amber-600 text-[11px] font-medium"></span>
                     </div>
-
                     <div class="bg-blue-50 border border-blue-100 rounded-2xl py-3 px-4 flex items-center gap-3">
-                        <div class="loader ease-linear rounded-full border-2 border-t-2 border-blue-400 h-4 w-4"></div>
+                        <div class="loader rounded-full border-2 border-t-2 border-blue-400 h-4 w-4"></div>
                         <span class="text-blue-700 text-[12px] font-medium">ตรวจสอบยอดชำระเงินอัตโนมัติ...</span>
                     </div>
                 </div>
             </div>
-
-            <div class="flex gap-2 p-4 bg-gray-50 border-t border-gray-100 shrink-0 no-print">
-                <button class="flex-1 bg-white border border-gray-200 active:bg-gray-100 text-gray-600 font-semibold py-3.5 rounded-xl text-sm transition" onclick="cancelTransaction()">ยกเลิก</button>
-                <button class="flex-[2] bg-[#1e3a8a] active:bg-blue-900 text-white font-semibold py-3.5 rounded-xl text-sm transition shadow-md" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
+            <div class="flex gap-2 p-4 bg-gray-50 border-t">
+                <button class="flex-1 bg-white border py-3.5 rounded-xl text-sm font-semibold" onclick="cancelTransaction()">ยกเลิก</button>
+                <button class="flex-[2] bg-[#1e3a8a] text-white py-3.5 rounded-xl text-sm font-semibold shadow-md" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
             </div>
         </div>
     </div>
 
-    <div id="screen-receipt" class="hidden flex-col h-full bg-white overflow-y-auto relative">
-        
-        <div class="bg-green-500 text-white py-4 shadow-md no-print z-10 shrink-0 relative flex items-center justify-center">
-            <button onclick="resetApp()" class="absolute left-4 text-white hover:text-green-100 flex items-center gap-1 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </button>
+    <div id="screen-receipt" class="hidden flex-col h-full bg-white overflow-y-auto">
+        <div class="bg-green-500 text-white py-4 shadow-md flex items-center justify-center relative shrink-0">
+            <button onclick="resetApp()" class="absolute left-4"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></button>
             <h2 class="font-bold text-xl uppercase">ชำระเงินสำเร็จ</h2>
         </div>
-
-        <div class="flex-1 p-4 flex flex-col items-center pt-8 bg-gray-200">
-            <div id="print-receipt-area" class="bg-white p-3 shadow-sm border border-gray-300 w-[58mm] min-h-[100mm] flex flex-col receipt-font text-black">
-                
+        <div class="flex-1 p-4 flex flex-col items-center bg-gray-200">
+            <div id="print-receipt-area" class="bg-white p-3 border w-[58mm] min-h-[100mm] flex flex-col receipt-font">
                 <div class="text-center w-full mb-1">-- Cashless Information --</div>
-                <div class="w-full text-left">==========================</div>
-                
-                <div class="flex w-full">
-                    <span class="w-24">TID :</span>
-                    <span>012D4514</span>
-                </div>
-                <div class="flex w-full">
-                    <span class="w-24">TRANCE ID :</span>
-                    <span id="r-trace"></span>
-                </div>
-                <div class="flex w-full">
-                    <span class="w-24">Ref no #:</span>
-                    <span id="r-ref"></span>
-                </div>
-                
-                <div class="w-full text-left mt-1">SALE</div>
-                <div class="flex justify-between w-full font-bold mb-1">
-                    <span>AMOUNT</span>
-                    <span id="r-amount"></span>
-                </div>
-                
-                <div class="w-full text-left">==========================</div>
-                <div class="w-full text-left mb-6">CUSTOMERNAME</div>
-
-                <div class="text-center w-full mt-4">SIGN</div>
-                <div class="text-center w-full mb-4">____________________</div>
-
-                <div class="mt-2 flex flex-col items-center w-full">
-                    <p class="text-center text-[11px] mb-1">SCAN TO VOID</p>
+                <div class="w-full">==========================</div>
+                <div class="flex justify-between"><span>TID:</span><span>012D4514</span></div>
+                <div class="flex justify-between"><span>TRACE ID:</span><span id="r-trace"></span></div>
+                <div class="flex justify-between"><span>REF NO #:</span><span id="r-ref"></span></div>
+                <div class="mt-1 uppercase">Sale</div>
+                <div class="flex justify-between font-bold mb-1"><span>AMOUNT</span><span id="r-amount"></span></div>
+                <div class="w-full">==========================</div>
+                <div class="mb-6">CUSTOMERNAME</div>
+                <div class="text-center mt-4">SIGN</div>
+                <div class="text-center mb-4">____________________</div>
+                <div class="flex flex-col items-center w-full">
+                    <p class="text-[11px] mb-1">SCAN TO VOID</p>
                     <svg id="void-barcode"></svg>
                 </div>
-
-                <div class="mt-5 text-center w-full">com.arke 1.19.49</div>
-                <div class="text-center w-full">- - -CUSTOMER COPY- - -</div>
-
+                <div class="mt-5 text-center">com.arke 1.19.49</div>
+                <div class="text-center">- - -CUSTOMER COPY- - -</div>
             </div>
-
-            <div class="w-full mt-8 flex flex-col gap-3 no-print px-4 pb-8 max-w-sm">
-                <button class="w-full bg-blue-600 active:bg-blue-700 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="printReceipt()">🖨️ พิมพ์ใบเสร็จ (Print)</button>
-                <button class="w-full bg-gray-600 active:bg-gray-700 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="resetApp()">กลับหน้าแรก</button>
+            <div class="w-full mt-8 flex flex-col gap-3 px-4 pb-8 max-w-sm">
+                <button class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="printReceipt()">🖨️ พิมพ์ใบเสร็จ (Print)</button>
+                <button class="w-full bg-gray-600 text-white font-bold py-4 rounded-xl text-lg shadow-sm" onclick="resetApp()">กลับหน้าแรก</button>
             </div>
         </div>
     </div>
 
     <script>
-        const BEAM_API_KEY = "76vw3ileCpe/EBXT1qRFLXxnEE2BTM7jlC/4bLvDuDk=";
         let amountStr = "0";
-        let timerInterval;
-        let pollingInterval; 
-        let currentChargeId = null; 
+        let timerInterval, pollingInterval, currentChargeId = null;
 
-        function updateDisplay() {
-            let num = parseInt(amountStr, 10);
-            document.getElementById('amountDisplay').innerText = (num / 100).toFixed(2);
-        }
-
-        function pressKey(key) {
-            if (amountStr.length >= 8) return; 
-            if (amountStr === "0") {
-                if(key === '00' || key === '0') return;
-                amountStr = key;
-            } else {
-                amountStr += key;
-            }
-            updateDisplay();
-        }
-
-        function pressClear() {
-            amountStr = "0";
-            updateDisplay();
-        }
-
-        function switchScreen(id) {
-            document.getElementById('screen-keypad').classList.add('hidden');
-            document.getElementById('screen-keypad').classList.remove('flex');
-            
-            document.getElementById('screen-qr').classList.add('hidden');
-            document.getElementById('screen-qr').classList.remove('flex');
-            
-            document.getElementById('screen-receipt').classList.add('hidden');
-            document.getElementById('screen-receipt').classList.remove('flex');
-            
+        function pressKey(k) { if (amountStr.length < 8) { amountStr = amountStr === "0" ? k : amountStr + k; updateDisplay(); } }
+        function pressClear() { amountStr = "0"; updateDisplay(); }
+        function updateDisplay() { document.getElementById('amountDisplay').innerText = (parseInt(amountStr, 10)/100).toFixed(2); }
+        
+        function switchScreen(id) { 
+            ['screen-keypad', 'screen-qr', 'screen-receipt'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             document.getElementById(id).classList.add('flex');
         }
 
-        function initDate() {
-            const now = new Date();
-            const d = String(now.getDate()).padStart(2, '0');
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const y = now.getFullYear() + 543;
-            document.getElementById('display-date').innerText = `, ${d}/${m}/${y}`;
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            let timer = 300; // 5 นาที
-            const display = document.getElementById('timer');
-            
-            timerInterval = setInterval(() => {
-                let minutes = parseInt(timer / 60, 10);
-                let seconds = parseInt(timer % 60, 10);
-
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                display.textContent = minutes + ":" + seconds;
-
-                if (--timer < 0) {
-                    clearInterval(timerInterval);
-                    clearInterval(pollingInterval); // หยุดเช็คยอด
-                    display.textContent = "00:00";
-                    alert("เซสชันหมดอายุ กรุณาทำรายการใหม่");
-                    cancelTransaction();
-                }
-            }, 1000);
-        }
-
-        // ================= ฟังก์ชันสร้าง QR =================
         async function createSale() {
-            let amountVal = parseInt(amountStr, 10);
-            if (amountVal <= 0) {
-                alert("กรุณาป้อนยอดเงินก่อนสร้างรายการ");
-                return;
-            }
-
-            let amountThb = (amountVal / 100).toFixed(2);
-            document.getElementById('qr-amount').innerText = amountThb;
-            
-            initDate();
-            startTimer();
+            let val = parseInt(amountStr, 10);
+            if (val <= 0) return alert("ป้อนยอดเงินก่อน");
+            document.getElementById('qr-amount').innerText = (val/100).toFixed(2);
             switchScreen('screen-qr');
-            
-            const targetApiUrl = "https://api.beamcheckout.com/api/v1/charges"; 
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetApiUrl);
+            startTimer();
 
             try {
-                const response = await fetch(proxyUrl, {
+                const res = await fetch("/api/create-charge", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${BEAM_API_KEY}`
-                    },
-                    body: JSON.stringify({ amount: amountVal, currency: "THB", paymentMethod: "PROMPTPAY" })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: val, currency: "THB", paymentMethod: "PROMPTPAY" })
                 });
-                
-                if (!response.ok) throw new Error("API Error");
-                const data = await response.json();
-                
-                if (data && data.qrCodeUrl) {
-                    currentChargeId = data.id; 
-                    renderQR(data.qrCodeUrl);
-                    
-                    // เริ่มระบบตรวจสอบยอดอัตโนมัติ ทุกๆ 3 วินาที
-                    pollingInterval = setInterval(() => {
-                        checkPaymentStatus(false);
-                    }, 3000);
-                    
-                } else {
-                    throw new Error("Invalid Data");
+                const data = await res.json();
+                if (data.id) {
+                    currentChargeId = data.id;
+                    document.getElementById('qr-container').innerHTML = `<img id="qr-image" src="${data.qrCodeUrl}" class="w-[200px] h-[200px]">`;
+                    pollingInterval = setInterval(() => checkStatus(false), 3000);
                 }
-            } catch (error) {
-                // Fallback จำลองการทำงานหาก API มีปัญหา
-                currentChargeId = "mock_charge_id_123";
-                setTimeout(() => {
-                    renderQR(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MockBBLPay-${amountThb}`);
-                }, 800);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        function renderQR(url) {
-            document.getElementById('qr-container').innerHTML = `<img id="qr-image" src="${url}" alt="QR Code" class="w-[200px] h-[200px]" />`;
-        }
-
-        // ================= ฟังก์ชันเช็คสถานะการจ่ายเงิน =================
-        async function checkPaymentStatus(isManualClick) {
+        async function checkStatus(manual) {
             if (!currentChargeId) return;
-
-            // สำหรับโหมดจำลอง (Mock) เมื่อกดยืนยันเอง
-            if (currentChargeId === "mock_charge_id_123") {
-                if (isManualClick) {
-                    const confirmMock = confirm("ระบบจำลอง: ได้รับเงินโอนเรียบร้อยแล้วใช่หรือไม่?\n(ถ้ากด Cancel จะไม่สามารถไปต่อได้)");
-                    if (confirmMock) {
-                        processSuccess();
-                    } else {
-                        alert("กรุณาตรวจสอบรายการอีกครั้ง ระบบยังไม่ได้รับยอดเงิน");
-                    }
-                }
-                return;
-            }
-
-            const targetApiUrl = `https://api.beamcheckout.com/api/v1/charges/${currentChargeId}`;
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetApiUrl);
-
             try {
-                const response = await fetch(proxyUrl, {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${BEAM_API_KEY}` }
-                });
-
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-
-                if (data.status === 'successful' || data.status === 'paid' || data.status === 'succeeded') {
-                    // เงินเข้าแล้ว!
-                    processSuccess();
-                } else {
-                    // เงินยังไม่เข้า
-                    if (isManualClick) {
-                        alert("กรุณาตรวจสอบรายการอีกครั้ง ระบบยังไม่ได้รับยอดเงิน");
-                    }
+                const res = await fetch(`/api/check-status?id=${currentChargeId}`);
+                const data = await res.json();
+                if (data.status === 'successful' || data.status === 'paid') {
+                    success(data.id);
+                } else if (manual) {
+                    alert("กรุณาตรวจสอบรายการอีกครั้ง ระบบยังไม่ได้รับยอดเงิน");
                 }
-            } catch (error) {
-                if (isManualClick) {
-                    alert("ไม่สามารถเชื่อมต่อระบบตรวจสอบสถานะได้ในขณะนี้");
-                }
-            }
+            } catch (e) { if(manual) alert("เกิดข้อผิดพลาด"); }
         }
 
-        // ================= ฟังก์ชันเมื่อจ่ายสำเร็จ =================
-        function processSuccess() {
-            clearInterval(timerInterval);
-            clearInterval(pollingInterval);
-
-            let amountThb = (parseInt(amountStr, 10) / 100).toFixed(2);
-            const traceId = Math.floor(100000 + Math.random() * 900000);
-            const refNo = currentChargeId && currentChargeId !== "mock_charge_id_123" 
-                          ? currentChargeId.substring(0, 8).toUpperCase() 
-                          : Math.random().toString(36).substring(2, 10).toUpperCase();
-
-            document.getElementById('r-trace').innerText = traceId;
-            document.getElementById('r-ref').innerText = refNo;
-            document.getElementById('r-amount').innerText = amountThb; 
-
-            JsBarcode("#void-barcode", `VOID-${refNo}`, {
-                format: "CODE128", width: 1.5, height: 40, displayValue: true, fontSize: 12, margin: 0, font: "monospace"
-            });
-
+        function success(id) {
+            clearInterval(timerInterval); clearInterval(pollingInterval);
+            document.getElementById('r-amount').innerText = (parseInt(amountStr, 10)/100).toFixed(2);
+            document.getElementById('r-trace').innerText = Math.floor(100000 + Math.random()*900000);
+            document.getElementById('r-ref').innerText = id.substring(0, 8).toUpperCase();
+            JsBarcode("#void-barcode", `VOID-${id}`, { format:"CODE128", width:1.5, height:40, displayValue:true });
             switchScreen('screen-receipt');
         }
 
-        function cancelTransaction() {
-            clearInterval(timerInterval);
-            clearInterval(pollingInterval);
-            currentChargeId = null;
-            pressClear();
-            document.getElementById('qr-container').innerHTML = '<span id="qr-loading" class="text-gray-400 animate-pulse text-sm px-8 py-16 inline-block">กำลังสร้าง...</span>';
-            switchScreen('screen-keypad');
+        function startTimer() {
+            let t = 300;
+            timerInterval = setInterval(() => {
+                let m = Math.floor(t/60), s = t%60;
+                document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
+                if (--t < 0) { cancelTransaction(); alert("หมดเวลา"); }
+            }, 1000);
         }
 
-        function verifyTransaction() {
-            checkPaymentStatus(true); // true = การกดตรวจสอบเองด้วยมือ
-        }
-
-        function printQR() {
-            document.body.classList.add('printing-qr');
-            window.print();
-            document.body.classList.remove('printing-qr');
-        }
-
-        function printReceipt() {
-            document.body.classList.add('printing-receipt');
-            window.print();
-            document.body.classList.remove('printing-receipt');
-        }
-
-        function resetApp() {
-            cancelTransaction();
-        }
+        function cancelTransaction() { clearInterval(timerInterval); clearInterval(pollingInterval); amountStr="0"; updateDisplay(); switchScreen('screen-keypad'); }
+        function verifyTransaction() { checkStatus(true); }
+        function printQR() { document.body.classList.add('printing-qr'); window.print(); document.body.classList.remove('printing-qr'); }
+        function printReceipt() { document.body.classList.add('printing-receipt'); window.print(); document.body.classList.remove('printing-receipt'); }
+        function resetApp() { cancelTransaction(); }
     </script>
 </body>
 </html>
