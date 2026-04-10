@@ -66,21 +66,26 @@
             <span class="text-slate-400 font-bold mb-1 w-full text-left text-xs uppercase tracking-widest">AMOUNT (บาท)</span>
             <span id="amountDisplay" class="text-6xl font-mono font-bold text-[#1e3a8a] tracking-tighter">0.00</span>
         </div>
+        
         <div class="flex-1 grid grid-cols-3 gap-px bg-slate-200">
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('1')">1</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('2')">2</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('3')">3</button>
+            
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('4')">4</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('5')">5</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('6')">6</button>
+            
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('7')">7</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('8')">8</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('9')">9</button>
-            <button class="bg-red-50 text-red-600 text-3xl font-bold active:bg-red-100" onclick="pressClear()">C</button>
+            
+            <button class="bg-red-50 text-red-600 text-3xl font-bold active:bg-red-100 flex items-center justify-center" onclick="pressClear()">X</button>
             <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('0')">0</button>
-            <button class="bg-white active:bg-blue-100 text-3xl font-medium" onclick="pressKey('00')">00</button>
+            <button class="bg-yellow-50 text-yellow-600 text-3xl font-bold active:bg-yellow-100 flex items-center justify-center" onclick="pressDelete()">DEL</button>
         </div>
-        <button class="w-full bg-[#f97316] text-white font-bold py-8 text-2xl active:brightness-90 transition-all uppercase tracking-widest" onclick="createSale()">ทำรายการขาย</button>
+        
+        <button class="w-full bg-[#16a34a] text-white font-bold py-8 text-2xl active:brightness-90 transition-all uppercase tracking-widest" onclick="createSale()">ENTER</button>
     </div>
 
     <div id="screen-qr" class="hidden flex-col h-full bg-white w-full max-w-md relative">
@@ -190,7 +195,7 @@
 
     <script>
         let amountStr = "0", pollingInterval, currentChargeId = null;
-        let countdownTimer = null; // ตัวแปรสำหรับจับเวลานับถอยหลัง
+        let countdownTimer = null; 
 
         function pressKey(k) { 
             if (amountStr.length < 8) { 
@@ -199,8 +204,18 @@
                 updateDisplay(); 
             } 
         }
+        
         function pressClear() { amountStr = "0"; updateDisplay(); }
-        function updateDisplay() { document.getElementById('amountDisplay').innerText = (parseInt(amountStr, 10)/100).toFixed(2); }
+        
+        function pressDelete() { 
+            amountStr = amountStr.slice(0, -1); 
+            if (amountStr === "") amountStr = "0"; 
+            updateDisplay(); 
+        }
+        
+        function updateDisplay() { 
+            document.getElementById('amountDisplay').innerText = (parseInt(amountStr, 10)/100).toFixed(2); 
+        }
         
         function switchScreen(id) { 
             ['screen-keypad', 'screen-qr', 'screen-receipt', 'screen-failed'].forEach(s => {
@@ -293,7 +308,7 @@
 
         function success(id) {
             clearInterval(pollingInterval);
-            clearInterval(countdownTimer); // หยุดนับถอยหลังเมื่อจ่ายสำเร็จ
+            clearInterval(countdownTimer); 
 
             const amt = (parseInt(amountStr, 10)/100).toFixed(2);
             
@@ -316,7 +331,7 @@
 
         function cancelTransaction() { 
             clearInterval(pollingInterval); 
-            clearInterval(countdownTimer); // หยุดเวลาเมื่อกดยกเลิก
+            clearInterval(countdownTimer);
             currentChargeId = null; 
             amountStr = "0"; 
             updateDisplay(); 
