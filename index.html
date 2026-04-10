@@ -9,19 +9,44 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'IBM Plex Sans Thai', sans-serif; overscroll-behavior-y: none; background-color: #f8fafc; }
-        .receipt-font { font-family: monospace; line-height: 1.2; font-size: 13px; color: black; }
+        .receipt-font { font-family: monospace; line-height: 1.1; font-size: 12px; color: black; }
         .loader { border-top-color: #1e3a8a; animation: spinner 1s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #print-qr-slip, #print-receipt-slip { display: none; }
-        .paper-feed { height: 70px; } 
+        .paper-feed { height: 50px; } /* ปรับระยะฟีดกระดาษตอนท้ายให้พอดีฉีก */
 
+        /* ================= ปรับจูนพิเศษสำหรับ Sunmi 58mm (48mm Safe Zone) ================= */
         @media print {
-            @page { margin: 0; size: 58mm auto; }
-            body { background: white; margin: 0; padding: 0; width: 58mm; overflow: visible; }
+            @page { 
+                margin: 0; 
+                size: 58mm auto; /* หน้ากว้างกระดาษ Sunmi */
+            }
+            body { 
+                background: white; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                width: 58mm; 
+                -webkit-print-color-adjust: exact;
+            }
             #screen-keypad, #screen-qr, #screen-receipt, #screen-failed { display: none !important; }
-            body.printing-qr #print-qr-slip { display: block !important; width: 58mm; padding: 2mm; text-align: center; }
-            body.printing-receipt #print-receipt-slip { display: block !important; width: 58mm; padding: 2mm; }
+
+            /* บีบเนื้อหาเข้า Safe Zone 48mm และตัด Margin ทิ้งทั้งหมด */
+            body.printing-qr #print-qr-slip, 
+            body.printing-receipt #print-receipt-slip { 
+                display: block !important; 
+                width: 48mm !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                float: left; /* บังคับชิดซ้ายสุดเพื่อให้หัวพิมพ์เริ่มงานทันที */
+                overflow: hidden;
+            }
+
+            /* ปรับขนาดรูปและ Barcode ให้ไม่หลุด 48mm */
+            img, svg { 
+                max-width: 46mm !important; 
+                height: auto !important; 
+            }
         }
     </style>
 </head>
@@ -29,7 +54,7 @@
 
     <div id="screen-keypad" class="flex flex-col h-full bg-white w-full max-w-md shadow-2xl relative">
         <div class="bg-[#1e3a8a] text-white text-center py-6 shadow-md">
-            <h2 class="font-bold text-2xl tracking-widest uppercase">QR Payment</h2>
+            <h2 class="font-bold text-2xl tracking-widest uppercase">ชำระเงินผ่าน QR Payment</h2>
         </div>
         <div class="px-10 py-12 flex flex-col justify-end items-end bg-slate-50 flex-none h-1/4 border-b">
             <span class="text-slate-400 font-bold mb-1 w-full text-left text-xs uppercase tracking-widest">ยอดเงิน (THB)</span>
@@ -55,7 +80,7 @@
     <div id="screen-qr" class="hidden flex-col h-full bg-white w-full max-w-md relative">
         <div class="bg-[#f0f2f5] px-6 py-5 flex items-center border-b shadow-sm">
             <button onclick="cancelTransaction()" class="text-gray-500 p-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">QR PAYMENT</div>
+            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">ชำระเงินด้วย QR PAYMENT</div>
         </div>
         <div class="flex-1 flex flex-col items-center p-6 overflow-y-auto">
             <img src="/src/promptpay.webp" class="h-8 mb-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
@@ -108,35 +133,34 @@
 
     <div id="screen-failed" class="hidden flex-col h-full bg-slate-100 items-center justify-center p-4 w-full">
         <div class="bg-white p-10 shadow-2xl w-full max-w-[360px] rounded-[3rem] text-center flex flex-col items-center">
-            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6"><img src="/src/payment_failed.2b608957.svg" class="w-16 h-16" onerror="this.src='https://cdn-icons-png.flaticon.com/512/753/753345.png'"></div>
+            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6"><img src="/src/payment_failed.svg" class="w-16 h-16" onerror="this.src='https://cdn-icons-png.flaticon.com/512/753/753345.png'"></div>
             <h3 class="font-bold text-2xl mb-2 text-red-600 uppercase">Decline</h3>
             <p id="error-message" class="text-slate-500 text-sm mb-10 leading-relaxed px-4">เกิดข้อผิดพลาดในการสร้างรายการ</p>
             <button class="w-full bg-[#0a1b4d] text-white font-bold py-5 rounded-3xl text-lg shadow-lg active:scale-95" onclick="resetApp()">กลับหน้าหลัก</button>
-            <div class="mt-8 text-[10px] text-gray-300 font-mono tracking-widest uppercase">ERROR: <span id="error-code-display">BEAM-400</span></div>
         </div>
     </div>
 
     <div id="print-qr-slip" class="receipt-font">
-        <div style="font-weight:bold; font-size:14px; text-align:center;">ชำระเงินผ่าน QR Promptpay</div>
-        <div style="text-align:center;">==========================</div>
-        <div id="qr-print-img" style="display:flex; justify-content:center; margin:10px 0;"></div>
-        <div style="text-align:center;">==========================</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px;"><span>ยอดรวม</span><span id="p-amount-qr"></span></div>
-        <div id="p-date-qr" style="font-size:10px; margin-top:20px;">Date: --/--/---- --:--:--</div>
+        <div style="font-weight:bold; font-size:13px; text-align:center;">ชำระเงินผ่าน QR Promptpay</div>
+        <div style="text-align:center;">--------------------------</div>
+        <div id="qr-print-img" style="display:flex; justify-content:center; margin:5px 0;"></div>
+        <div style="text-align:center;">--------------------------</div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>ยอดรวม</span><span id="p-amount-qr"></span></div>
+        <div id="p-date-qr" style="font-size:10px; margin-top:10px;">Date: --/--/---- --:--:--</div>
         <div class="paper-feed"></div>
     </div>
 
     <div id="print-receipt-slip" class="receipt-font">
-        <div style="text-align:center; font-weight:bold; font-size:15px;">-- Cashless Payment --</div>
-        <div style="text-align:center;">==========================</div>
+        <div style="text-align:center; font-weight:bold; font-size:13px;">-- Cashless Payment --</div>
+        <div style="text-align:center;">--------------------------</div>
         <div style="display:flex; justify-content:space-between;"><span>MID:</span><span id="p-mid">--</span></div>
         <div style="display:flex; justify-content:space-between;"><span>REF #:</span><span id="p-ref">--</span></div>
-        <div style="margin-top:10px; font-weight:bold;">SALE APPROVED</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px;"><span>TOTAL</span><span id="p-amount">0.00</span></div>
-        <div style="text-align:center; margin-top:8px;">==========================</div>
-        <div style="margin:40px 0; text-align:center; font-weight:bold;">SIGNATURE<br><br><br>_________________</div>
+        <div style="margin-top:5px; font-weight:bold;">SALE APPROVED</div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>TOTAL</span><span id="p-amount">0.00</span></div>
+        <div style="text-align:center; margin-top:5px;">--------------------------</div>
+        <div style="margin:20px 0; text-align:center; font-weight:bold;">SIGNATURE<br><br><br>_________________</div>
         <div style="display:flex; justify-content:center; margin:10px 0;"><svg id="void-barcode"></svg></div>
-        <div style="text-align:center; font-size:10px; margin-top:10px;">- - - MERCHANT COPY - - -</div>
+        <div style="text-align:center; font-size:9px; margin-top:5px;">- - - MERCHANT COPY - - -</div>
         <div class="paper-feed"></div>
     </div>
 
@@ -145,11 +169,7 @@
 
         function pressKey(k) { if (amountStr.length < 8) { amountStr = amountStr === "0" ? k : amountStr + k; updateDisplay(); } }
         function pressClear() { amountStr = "0"; updateDisplay(); }
-        function pressDelete() { 
-            amountStr = amountStr.slice(0, -1);
-            if (amountStr === "") amountStr = "0";
-            updateDisplay();
-        }
+        function pressDelete() { amountStr = amountStr.slice(0, -1); if (amountStr === "") amountStr = "0"; updateDisplay(); }
         function updateDisplay() { document.getElementById('amountDisplay').innerText = (parseInt(amountStr, 10)/100).toFixed(2); }
         
         function switchScreen(id) { 
@@ -182,7 +202,7 @@
                 currentChargeId = data.chargeId;
                 const base64QR = `data:image/png;base64,${data.encodedImage}`;
                 document.getElementById('qr-container').innerHTML = `<img src="${base64QR}" class="w-full h-full object-contain rounded-xl">`;
-                document.getElementById('qr-print-img').innerHTML = `<img src="${base64QR}" style="width:48mm; height:48mm;">`;
+                document.getElementById('qr-print-img').innerHTML = `<img src="${base64QR}" style="width:40mm; height:40mm;">`;
                 document.getElementById('r-mid-ui').innerText = data.mid || "N/A";
                 document.getElementById('p-mid').innerText = data.mid || "N/A";
 
@@ -199,13 +219,12 @@
                 const res = await fetch(`/api/check-status?id=${currentChargeId}`);
                 const data = await res.json();
                 const status = (data.status || "").toUpperCase();
-
                 if (status === 'SUCCEEDED' || status === 'SUCCESSFUL') {
                     success(data.chargeId || currentChargeId);
                 } else if (manual) {
-                    alert("สถานะ: " + status + "\nกรุณารอสักครู่");
+                    alert("ยังไม่ได้รับชำระเงิน");
                 }
-            } catch (e) { if(manual) alert("เกิดข้อผิดพลาดในการเช็คยอด"); }
+            } catch (e) { if(manual) alert("เกิดข้อผิดพลาด"); }
         }
 
         function success(id) {
@@ -216,23 +235,12 @@
             document.getElementById('p-amount').innerText = amt;
             document.getElementById('p-ref').innerText = id.substring(0, 12).toUpperCase();
             
-            JsBarcode("#void-barcode", `VOID-${id.substring(0,10)}`, { 
-                format:"CODE128", width:1.2, height:35, displayValue:true, fontSize:10 
-            });
-
+            JsBarcode("#void-barcode", `VOID-${id.substring(0,10)}`, { format:"CODE128", width:1, height:25, displayValue:true, fontSize:9 });
             switchScreen('screen-receipt');
-            // Auto Print Receipt when success
             setTimeout(() => { printReceipt(); }, 500);
         }
 
-        function cancelTransaction() { 
-            clearInterval(pollingInterval); 
-            currentChargeId = null; 
-            amountStr = "0"; 
-            updateDisplay(); 
-            switchScreen('screen-keypad'); 
-        }
-
+        function cancelTransaction() { clearInterval(pollingInterval); currentChargeId = null; amountStr = "0"; updateDisplay(); switchScreen('screen-keypad'); }
         function verifyTransaction() { checkStatus(true); }
 
         function printQR() { 
