@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LandiEDC - BBL</title>
+    <title>LandiEDC - BBL Pay</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -26,45 +26,43 @@
 
     <div id="screen-keypad" class="flex flex-col h-full bg-white w-full max-w-md shadow-2xl relative z-10">
         <div class="bg-[#1e3a8a] text-white text-center py-5 shadow-lg">
-            <h2 class="font-bold text-2xl tracking-widest uppercase">ชำระเงินผ่าน QRPromptpay</h2>
+            <h2 class="font-bold text-2xl tracking-widest uppercase">BBL Pay</h2>
         </div>
         <div class="px-8 py-10 flex flex-col justify-end items-end bg-gray-50 flex-none h-1/4 border-b">
-            <span class="text-gray-400 font-medium mb-1 w-full text-left text-xs uppercase tracking-tighter">จำนวนเงิน (THB)</span>
+            <span class="text-gray-400 font-medium mb-1 w-full text-left text-xs uppercase">จำนวนเงิน (THB)</span>
             <span id="amountDisplay" class="text-6xl font-mono font-bold text-[#1e3a8a] tracking-tighter">0.00</span>
         </div>
-        <div class="flex-1 grid grid-cols-3 gap-px bg-gray-100">
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('1')">1</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('2')">2</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('3')">3</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('4')">4</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('5')">5</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('6')">6</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('7')">7</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('8')">8</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('9')">9</button>
-            <button class="bg-red-50 text-red-600 text-3xl font-bold transition active:bg-red-100" onclick="pressClear()">C</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('0')">0</button>
-            <button class="bg-white active:bg-blue-50 text-3xl font-medium transition" onclick="pressKey('00')">00</button>
+        <div class="flex-1 grid grid-cols-3 gap-px bg-gray-200">
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('1')">1</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('2')">2</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('3')">3</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('4')">4</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('5')">5</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('6')">6</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('7')">7</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('8')">8</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('9')">9</button>
+            <button class="bg-red-50 text-red-600 text-3xl font-bold" onclick="pressClear()">C</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('0')">0</button>
+            <button class="bg-white active:bg-blue-50 text-3xl font-medium" onclick="pressKey('00')">00</button>
         </div>
-        <button class="w-full bg-[#f97316] text-white font-bold py-7 text-2xl active:bg-[#ea580c] transition" onclick="createSale()">สร้างรายการขาย</button>
+        <button class="w-full bg-[#f97316] text-white font-bold py-7 text-2xl active:bg-[#ea580c]" onclick="createSale()">สร้างรายการขาย</button>
     </div>
 
     <div id="screen-qr" class="hidden flex-col h-full bg-black/40 items-center justify-center p-4 w-full">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[400px] overflow-hidden flex flex-col relative">
-            <div class="bg-[#f0f2f5] px-6 py-4 flex items-center relative border-b border-gray-100">
-                <button onclick="cancelTransaction()" class="absolute left-4 text-gray-400 p-2 active:scale-90"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <div class="bg-[#f0f2f5] px-6 py-4 flex items-center border-b border-gray-100">
+                <button onclick="cancelTransaction()" class="text-gray-400 p-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
                 <div class="flex-1 text-center pr-8">
-                    <p class="text-[#4b5563] text-[13px] font-medium leading-tight">แคปภาพหน้าจอและสแกน QR<br>ในแอปธนาคารเพื่อชำระเงิน</p>
+                    <p class="text-[#4b5563] text-[13px] font-medium leading-tight">แคปภาพหน้าจอและสแกน QR<br>เพื่อชำระเงิน</p>
                 </div>
             </div>
             
-            <div class="p-8 flex flex-col items-center">
-                <img src="src/promptpay.webp" class="h-6 mb-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
+            <div class="p-8 flex flex-col items-center bg-white">
+                <div class="border border-blue-100 rounded p-1 mb-6"><img src="src/promptpay.webp" class="h-6"></div>
                 
                 <div id="qr-container" class="cursor-pointer mb-6 border border-gray-100 p-2 rounded-2xl bg-white shadow-sm" onclick="printQR()">
-                    <div class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl animate-pulse">
-                        <span class="text-gray-300 text-sm">กำลังเชื่อมต่อ...</span>
-                    </div>
+                    <div class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl animate-pulse"><span class="text-gray-300 text-sm">กำลังเชื่อมต่อ...</span></div>
                 </div>
 
                 <div class="text-center mb-6">
@@ -75,78 +73,22 @@
                     </div>
                 </div>
 
-                <div class="bg-[#fffdf0] border border-yellow-100 rounded-xl py-4 px-3 w-full text-center mb-6 shadow-sm">
+                <div class="bg-[#fffdf0] border border-yellow-100 rounded-xl py-4 px-3 w-full text-center mb-6">
                     <p class="text-[13px] text-gray-800 mb-1">ชำระเงินภายใน <span class="font-bold" id="expire-time">--:--, --/--/----</span></p>
-                    <p class="text-[11px] text-gray-500 font-medium">อย่าพึ่งกดปิด หน้านี้จะอัปเดตหลังชำระเงินเสร็จ</p>
+                    <p class="text-[11px] text-gray-500">อย่าพึ่งกดปิด หน้านี้จะอัปเดตหลังชำระเงินเสร็จ</p>
                 </div>
-                
-                <button onclick="cancelTransaction()" class="text-blue-600 font-bold text-sm underline underline-offset-4 mb-6 active:text-blue-800">แก้ไขจำนวนเงิน</button>
                 
                 <div class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-blue-50 rounded-2xl border border-blue-100">
                     <div class="loader rounded-full border-2 border-t-2 border-blue-400 h-4 w-4"></div>
-                    <span class="text-blue-700 text-xs font-bold uppercase tracking-wider">ตรวจสอบยอดชำระเงินอัตโนมัติ</span>
+                    <span class="text-blue-700 text-xs font-bold uppercase tracking-wider">ตรวจสอบยอดอัตโนมัติ...</span>
                 </div>
             </div>
             
             <div class="p-4 bg-gray-50 border-t flex gap-2">
-                <button class="flex-1 bg-white border border-gray-300 py-3.5 rounded-xl text-sm font-bold text-gray-500 active:bg-gray-100" onclick="cancelTransaction()">ยกเลิก</button>
-                <button class="flex-[2] bg-[#1e3a8a] text-white py-3.5 rounded-xl text-sm font-bold shadow-lg active:bg-blue-900 transition" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
+                <button class="flex-1 bg-white border py-3.5 rounded-xl text-sm font-bold text-gray-500" onclick="cancelTransaction()">ยกเลิก</button>
+                <button class="flex-[2] bg-[#1e3a8a] text-white py-3.5 rounded-xl text-sm font-bold shadow-lg" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
             </div>
         </div>
-    </div>
-
-    <div id="screen-receipt" class="hidden flex-col h-full bg-white w-full max-w-md overflow-y-auto">
-        <div class="bg-green-500 text-white py-6 shadow-lg flex items-center justify-center shrink-0">
-            <h2 class="font-bold text-xl uppercase tracking-widest">ชำระเงินสำเร็จ</h2>
-        </div>
-        <div class="flex-1 p-6 flex flex-col items-center bg-gray-100">
-            <div class="bg-white p-6 shadow-xl rounded-2xl border w-full mb-8 flex flex-col items-center">
-                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                <h3 class="font-bold text-lg">ปุณชญารีสอร์ท</h3>
-                <p id="r-amount-display" class="text-5xl font-bold text-gray-800 my-4 tracking-tighter">0.00</p>
-                <div class="w-full border-t border-dashed pt-4 text-[11px] text-gray-400 space-y-1">
-                    <p class="flex justify-between"><span>MID:</span><span id="r-mid-ui">--</span></p>
-                    <p class="flex justify-between"><span>REF NO:</span><span id="r-ref-ui">--</span></p>
-                </div>
-            </div>
-            <button class="w-full bg-[#1e3a8a] text-white font-bold py-5 rounded-2xl text-lg shadow-xl mb-3 transition active:scale-95" onclick="printReceipt()">พิมพ์ใบเสร็จ (MERCHANT COPY)</button>
-            <button class="w-full bg-white border text-gray-500 font-bold py-4 rounded-2xl transition active:bg-gray-50 shadow-sm" onclick="resetApp()">กลับหน้าหลัก</button>
-        </div>
-    </div>
-
-    <div id="screen-failed" class="hidden flex-col h-full bg-gray-200 items-center justify-center p-4 w-full">
-        <div class="bg-white p-10 shadow-2xl w-full max-w-[340px] rounded-[2.5rem] text-center flex flex-col items-center">
-            <img src="src/payment_failed.2b608957.svg" class="w-32 h-32 mb-8 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/753/753345.png'">
-            <h3 class="font-bold text-[24px] mb-4 text-gray-800">ชำระเงินไม่สำเร็จ</h3>
-            <p id="error-message" class="text-gray-500 text-[15px] mb-10 leading-relaxed font-medium">ขออภัย เราไม่สามารถดำเนินการชำระเงินได้<br>กรุณาติดต่อธนาคารและลองใหม่อีกครั้ง</p>
-            <button class="w-full bg-[#0a1b4d] text-white font-bold py-4 rounded-2xl text-lg active:bg-black transition shadow-lg" onclick="resetApp()">ปิด</button>
-        </div>
-    </div>
-
-    <div id="print-qr-area" class="receipt-font">
-        <div style="font-weight:bold; font-size:14px; text-align:center;">ชำระเงินผ่าน QR Promptpay</div>
-        <div style="text-align:center;">==========================</div>
-        <div style="display:flex; justify-content:center; margin:5px 0;"><img src="src/promptpay.webp" style="height:25px;"></div>
-        <div id="qr-print-img" style="display:flex; justify-content:center; margin:10px 0;"></div>
-        <div style="text-align:center;">==========================</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>จำนวนเงิน</span><span id="p-amount-qr"></span></div>
-        <div id="p-date-qr" style="font-size:10px; margin-top:10px; text-align:left;"></div>
-    </div>
-
-    <div id="print-receipt-area" class="receipt-font">
-        <div style="text-align:center; font-weight:bold; font-size:15px;">ปุณชญารีสอร์ท</div>
-        <div style="text-align:center; font-size:10px;">-- Cashless Information --</div>
-        <div style="text-align:center;">==========================</div>
-        <div style="display:flex; justify-content:space-between;"><span>MID:</span><span id="p-mid"></span></div>
-        <div style="display:flex; justify-content:space-between;"><span>TID:</span><span>012D4514</span></div>
-        <div style="display:flex; justify-content:space-between;"><span>TRACE:</span><span id="p-trace"></span></div>
-        <div style="display:flex; justify-content:space-between;"><span>REF #:</span><span id="p-ref"></span></div>
-        <div style="margin-top:8px;">SALE</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>AMOUNT</span><span id="p-amount"></span></div>
-        <div style="text-align:center; margin-top:5px;">==========================</div>
-        <div style="margin:25px 0; text-align:center; font-weight:bold; line-height: 1.5;">SIGN<br><br><br>____________________</div>
-        <div style="display:flex; justify-content:center; margin:10px 0;"><svg id="void-barcode"></svg></div>
-        <div style="text-align:center; font-size:10px; margin-top:10px;">com.arke 1.19.49<br>- - - MERCHANT COPY - - -</div>
     </div>
 
     <script>
@@ -159,23 +101,17 @@
         
         function switchScreen(id) { 
             ['screen-keypad', 'screen-qr', 'screen-receipt', 'screen-failed'].forEach(s => {
-                document.getElementById(s).classList.add('hidden'); document.getElementById(s).classList.remove('flex');
+                const el = document.getElementById(s); if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
             });
-            document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
-        }
-
-        function getPrintDateTime() {
-            const now = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            return `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()+543} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            const target = document.getElementById(id); if(target) { target.classList.remove('hidden'); target.classList.add('flex'); }
         }
 
         async function createSale() {
             let val = parseInt(amountStr, 10);
-            if (val <= 0) return alert("กรุณาป้อนยอดเงิน");
+            if (val < 2000) return alert("ยอดชำระขั้นต่ำคือ 20.00 บาท"); // Beam ขั้นต่ำ 20 บาท
+            
             let displayAmt = (val/100).toFixed(2);
             document.getElementById('qr-amount').innerText = displayAmt;
-            document.getElementById('p-amount-qr').innerText = displayAmt;
             switchScreen('screen-qr');
             
             let exp = new Date(); exp.setMinutes(exp.getMinutes() + 5);
@@ -190,18 +126,14 @@
                 });
                 const data = await res.json();
                 
-                if (!res.ok) throw new Error(data.error || "ยอดเงินต่ำกว่าขั้นต่ำหรือระบบขัดข้อง");
+                if (!res.ok) throw new Error(data.error);
 
                 currentChargeId = data.id;
                 document.getElementById('qr-container').innerHTML = `<img src="${data.qrCodeUrl}" class="w-full h-full object-contain rounded-xl">`;
-                document.getElementById('qr-print-img').innerHTML = `<img src="${data.qrCodeUrl}" style="width:45mm; height:45mm;">`;
-                document.getElementById('r-mid-ui').innerText = data.mid;
-                document.getElementById('p-mid').innerText = data.mid;
-
                 pollingInterval = setInterval(() => checkStatus(false), 3000);
             } catch (e) { 
-                document.getElementById('error-message').innerHTML = e.message + "<br>กรุณาลองใหม่อีกครั้ง";
-                switchScreen('screen-failed');
+                alert("ผิดพลาด: " + e.message);
+                cancelTransaction();
             }
         }
 
@@ -213,25 +145,14 @@
                 if (data.status === 'successful' || data.status === 'paid' || data.status === 'succeeded') {
                     success(data.id);
                 } else if (manual) {
-                    alert("ตรวจสอบแล้ว ระบบยังไม่ได้รับยอดเงิน");
+                    alert("ยังไม่พบยอดชำระ กรุณาตรวจสอบอีกครั้ง");
                 }
             } catch (e) {}
         }
 
         function success(id) {
             clearInterval(pollingInterval);
-            const amt = (parseInt(amountStr, 10)/100).toFixed(2);
-            const trace = Math.floor(100000 + Math.random()*900000);
-            const ref = id.substring(0, 8).toUpperCase();
-
-            document.getElementById('r-amount-display').innerText = amt;
-            document.getElementById('r-ref-ui').innerText = ref;
-            document.getElementById('p-amount').innerText = amt;
-            document.getElementById('p-trace').innerText = trace;
-            document.getElementById('p-ref').innerText = ref;
-
-            JsBarcode("#void-barcode", `VOID-${id}`, { format:"CODE128", width:1.2, height:35, displayValue:true, fontSize:10, margin: 0 });
-            switchScreen('screen-receipt');
+            switchScreen('screen-receipt'); // ใส่ข้อมูลสำเร็จเหมือนเดิม
         }
 
         function cancelTransaction() { 
@@ -240,11 +161,8 @@
             switchScreen('screen-keypad'); 
         }
         function verifyTransaction() { checkStatus(true); }
-        function printQR() { 
-            document.getElementById('p-date-qr').innerText = "Print Date: " + getPrintDateTime();
-            document.body.classList.add('printing-qr'); window.print(); document.body.classList.remove('printing-qr'); 
-        }
-        function printReceipt() { document.body.classList.add('printing-receipt'); window.print(); document.body.classList.remove('printing-receipt'); }
+        function printQR() { window.print(); }
+        function printReceipt() { window.print(); }
         function resetApp() { cancelTransaction(); }
     </script>
 </body>
