@@ -184,19 +184,28 @@
         }
 
         async function checkStatus(manual) {
-            if (!currentChargeId) return;
-            try {
-                const res = await fetch(`/api/check-status?id=${currentChargeId}`);
-                const data = await res.json();
-                // ✅ ตรวจสอบสถานะตามคู่มือ Beam (SUCCEEDED)
-                if (data.status === 'SUCCEEDED' || data.status === 'successful' || data.status === 'paid') {
-                    success(data.id);
-                } else if (manual) {
-                    alert("ยังไม่พบยอดชำระ กรุณารอสักครู่");
-                }
-            } catch (e) { if(manual) alert("เกิดข้อผิดพลาดในการตรวจสอบ"); }
-        }
+    if (!currentChargeId) return;
+    try {
+        const res = await fetch(`/api/check-status?id=${currentChargeId}`);
+        const data = await res.json();
+        
+        // ⚠️ คู่มือระบุว่าสำเร็จคือ 'SUCCEEDED' (ตัวใหญ่)
+        const status = data.status ? data.status.toUpperCase() : "";
 
+        if (status === 'SUCCEEDED') {
+            // ✅ เงินเข้าแล้ว! เปลี่ยนหน้าไปใบเสร็จทันที
+            success(data.chargeId || currentChargeId);
+        } else if (status === 'FAILED') {
+            // ❌ จ่ายไม่สำเร็จ (เช่น เงินไม่พอ)
+            showEdcError("การชำระเงินถูกปฏิเสธ (Failed)", "BEAM-FAILED");
+        } else if (manual) {
+            // ถ้ากดปุ่มตรวจสอบเอง แล้วยังไม่สำเร็จ
+            alert("สถานะ: " + status + "\nกรุณารอระบบยืนยันยอด หรือเช็คในแอปธนาคาร");
+        }
+    } catch (e) {
+        console.error("Polling Error:", e);
+    }
+}
         function success(id) {
             clearInterval(pollingInterval);
             const amt = (parseInt(amountStr, 10)/100).toFixed(2);
