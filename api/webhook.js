@@ -1,8 +1,13 @@
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        console.log("🔔 Webhook Received:", JSON.stringify(req.body, null, 2));
-        // ข้อมูลนี้จะปรากฏในหน้า Logs ของ Vercel
-        return res.status(200).json({ received: true });
+    if (req.method !== 'POST') return res.status(405).end();
+    
+    // บันทึก Log ลง Vercel เพื่อดูย้อนหลัง
+    console.log("💰 [Beam Webhook Received]:", JSON.stringify(req.body, null, 2));
+
+    if (req.body.event === 'charge.succeeded') {
+        const { id, amount, referenceNo } = req.body.data;
+        console.log(`✅ ชำระสำเร็จ! ID: ${id}, ยอด: ${amount} THB, Ref: ${referenceNo}`);
     }
-    res.status(405).end();
+
+    return res.status(200).json({ received: true });
 }
