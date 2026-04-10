@@ -11,41 +11,18 @@
     
     <style>
         body { font-family: 'IBM Plex Sans Thai', sans-serif; overscroll-behavior-y: none; background-color: #f3f4f6; }
-        
-        /* ฟอนต์สำหรับบิลและใบเสร็จ */
         .print-font { font-family: monospace; line-height: 1.2; font-size: 13px; }
-        
         .loader { border-top-color: #3b82f6; animation: spinner 1s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* ซ่อนส่วนพิมพ์ในหน้าจอปกติ */
         #print-qr-slip, #print-receipt-slip { display: none; }
 
-        /* ----- ระบบ CSS Print สำหรับ 58mm ----- */
         @media print {
             @page { margin: 0; width: 58mm; }
             body { background: white; margin: 0; padding: 0; }
-            
-            /* ซ่อน UI หน้าจอทั้งหมดเวลาพิมพ์ */
             #screen-keypad, #screen-qr, #screen-receipt { display: none !important; }
-
-            /* กรณีพิมพ์ QR Code */
-            body.printing-qr #print-qr-slip {
-                display: block !important;
-                width: 58mm;
-                padding: 2mm;
-                margin: 0;
-                color: black;
-            }
-
-            /* กรณีพิมพ์ใบเสร็จ (Receipt) */
-            body.printing-receipt #print-receipt-slip {
-                display: block !important;
-                width: 58mm;
-                padding: 2mm;
-                margin: 0;
-                color: black;
-            }
+            body.printing-qr #print-qr-slip { display: block !important; width: 58mm; padding: 2mm; margin: 0; color: black; }
+            body.printing-receipt #print-receipt-slip { display: block !important; width: 58mm; padding: 2mm; margin: 0; color: black; }
         }
     </style>
 </head>
@@ -53,7 +30,7 @@
 
     <div id="screen-keypad" class="flex flex-col h-full bg-white relative z-10 w-full max-w-[400px] mx-auto shadow-2xl">
         <div class="bg-[#1e3a8a] text-white text-center py-4 shadow-md">
-            <h2 class="font-bold text-2xl tracking-widest uppercase">ชำระเงินผ่าน QR CODE</h2>
+            <h2 class="font-bold text-2xl tracking-widest uppercase">ชำระเงินผ่าน QR Promptpay</h2>
         </div>
         <div class="px-6 py-8 flex flex-col justify-end items-end bg-gray-50 flex-none h-1/4 border-b">
             <span class="text-gray-400 font-medium mb-1 w-full text-left">จำนวนเงิน (THB)</span>
@@ -77,52 +54,52 @@
     </div>
 
     <div id="screen-qr" class="hidden flex-col h-full bg-black/50 items-center justify-center p-4">
-        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-[400px] overflow-hidden flex flex-col relative">
+        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-[400px] overflow-hidden flex flex-col relative">
             
-            <div class="bg-[#f8f9fb] px-6 py-4 flex items-center relative border-b border-gray-100">
+            <div class="bg-[#f0f2f5] px-6 py-4 flex items-center relative border-b border-gray-100">
                 <button onclick="cancelTransaction()" class="absolute left-4 text-gray-500 flex items-center gap-1 active:text-gray-800">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    <span class="text-[13px] font-semibold">กลับ</span>
                 </button>
                 <div class="flex-1 flex flex-col items-center">
-                    <p class="text-[#4b5563] text-[12px] font-medium text-center">แสกน QR CODE ผ่านแอพธนาคาร<br>เพื่อชำระเงิน</p>
+                    <p class="text-[#4b5563] text-[13px] font-medium text-center">แคปภาพหน้าจอและสแกน QR<br>ในแอปธนาคารเพื่อชำระเงิน</p>
                 </div>
             </div>
 
             <div class="p-6 flex flex-col items-center bg-white">
-                <img src="src/promptpay.webp" alt="PromptPay" class="h-8 mb-4 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
-
-                <div class="text-center w-full mb-2">
-                    <span class="text-amber-600 text-[13px] font-semibold bg-amber-50 px-3 py-1 rounded-full">
-                        ชำระเงินภายใน <span id="timer">05:00</span> นาที
-                    </span>
+                <div class="border border-blue-200 rounded p-1 mb-4">
+                    <img src="src/promptpay.webp" alt="PromptPay" class="h-6 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
                 </div>
 
-                <div class="cursor-pointer mb-6 border border-gray-200 p-2 rounded-2xl hover:bg-gray-50 transition" onclick="printQR()" title="คลิกเพื่อพิมพ์ QR Code">
-                    <div id="qr-container" class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl">
-                        <span class="text-gray-400 text-sm animate-pulse">กำลังเชื่อมต่อ API...</span>
+                <div class="cursor-pointer mb-4" onclick="printQR()" title="คลิกเพื่อพิมพ์ QR Code">
+                    <div id="qr-container" class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl border border-gray-100">
+                        <span class="text-gray-400 text-sm animate-pulse">กำลังดึงข้อมูล...</span>
                     </div>
                 </div>
 
-                <div class="text-center mb-6">
-                    <p class="text-gray-400 text-[13px] mb-1">จำนวนเงิน</p>
+                <div class="text-center mb-2">
+                    <p class="text-gray-500 text-[13px] mb-1">ชำระเงินให้ ปุณชญารีสอร์ท</p>
                     <div class="flex items-baseline justify-center gap-1">
                         <span id="qr-amount" class="text-4xl font-bold text-gray-800">0.00</span>
-                        <span class="text-lg font-medium text-gray-400">บาท</span>
+                        <span class="text-lg font-medium text-gray-800">บาท</span>
                     </div>
                 </div>
 
-                <div class="w-full">
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl py-3 px-4 flex items-center justify-center gap-3">
-                        <div class="loader rounded-full border-2 border-t-2 border-blue-500 h-4 w-4"></div>
-                        <span class="text-blue-700 text-[12px] font-medium">ตรวจสอบยอดชำระเงินอัตโนมัติ</span>
-                    </div>
+                <div class="bg-[#fffdf0] border border-yellow-100 rounded-lg py-3 px-2 w-full text-center mt-2 mb-4">
+                    <p class="text-[13px] text-gray-800 mb-1">
+                        ชำระเงินภายใน <span class="font-bold" id="expire-time">--:--, --/--/----</span>
+                    </p>
+                    <p class="text-[12px] text-gray-500">
+                        อย่าพึ่งกดปิด หน้านี้จะอัปเดตหลังชำระเงินเสร็จ
+                    </p>
                 </div>
+
+                <button class="bg-[#2443a5] text-white px-6 py-2 text-[13px] font-semibold rounded" onclick="cancelTransaction()">
+                    แก้ไขจำนวนเงิน
+                </button>
             </div>
-
-            <div class="flex gap-2 p-4 bg-gray-50 border-t border-gray-100">
-                <button class="flex-1 bg-white border border-gray-300 py-3.5 rounded-xl text-sm font-semibold active:bg-gray-100" onclick="cancelTransaction()">ยกเลิก</button>
-                <button class="flex-[2] bg-[#1e3a8a] text-white py-3.5 rounded-xl text-sm font-semibold shadow-md active:bg-blue-900" onclick="verifyTransaction()">ตรวจสอบรายการ</button>
+            
+            <div class="flex p-4 bg-gray-50 border-t border-gray-100">
+                <button class="w-full bg-white border border-gray-300 py-3 rounded-xl text-sm font-semibold active:bg-gray-100 shadow-sm" onclick="verifyTransaction()">ตรวจสอบรายการ (Manual)</button>
             </div>
         </div>
     </div>
@@ -131,7 +108,6 @@
         <div class="bg-green-500 text-white w-full max-w-[400px] py-4 shadow-md flex items-center justify-center relative shrink-0">
             <h2 class="font-bold text-xl uppercase">ชำระเงินสำเร็จ</h2>
         </div>
-        
         <div class="flex-1 p-4 flex flex-col items-center w-full max-w-[400px] pt-8">
             <div class="bg-white p-4 shadow-lg border border-gray-300 w-full max-w-[300px] rounded-lg text-center flex flex-col items-center">
                 <div class="text-green-500 mb-2">
@@ -152,59 +128,33 @@
     <div id="print-qr-slip" class="print-font">
         <div class="text-center font-bold text-[14px] mb-1">ชำระเงินผ่าน QR Promptpay</div>
         <div class="w-full overflow-hidden text-center">================================</div>
-        
-        <div class="flex justify-center my-2">
-            <img src="src/promptpay.webp" class="h-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
-        </div>
-        
-        <div class="flex justify-center my-2">
-            <img id="print-qr-image" src="" class="w-[45mm] h-[45mm]">
-        </div>
-        
+        <div class="flex justify-center my-2"><img src="src/promptpay.webp" class="h-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'"></div>
+        <div class="flex justify-center my-2"><img id="print-qr-image" src="" class="w-[45mm] h-[45mm]"></div>
         <div class="w-full overflow-hidden text-center">================================</div>
-        
-        <div class="flex justify-between w-full font-bold my-1 text-[15px]">
-            <span>จำนวนเงิน</span>
-            <span id="print-qr-amount">0.00</span>
-        </div>
-        
-        <div class="w-full text-left text-[11px] mt-2" id="print-qr-date">
-            Print Date: --/--/---- --:--:--
-        </div>
+        <div class="flex justify-between w-full font-bold my-1 text-[15px]"><span>จำนวนเงิน</span><span id="print-qr-amount">0.00</span></div>
+        <div class="w-full text-left text-[11px] mt-2" id="print-qr-date">Print Date: --/--/---- --:--:--</div>
     </div>
 
     <div id="print-receipt-slip" class="print-font text-black">
         <div class="text-center w-full mb-1">-- Cashless Information --</div>
         <div class="w-full text-center overflow-hidden">================================</div>
-        
         <div class="flex justify-between w-full"><span>TID:</span><span>012D4514</span></div>
         <div class="flex justify-between w-full"><span>TRACE ID:</span><span id="p-trace"></span></div>
         <div class="flex justify-between w-full"><span>REF NO #:</span><span id="p-ref"></span></div>
-        
         <div class="mt-1 w-full text-left uppercase">Sale</div>
-        <div class="flex justify-between w-full font-bold mb-1 text-[14px]">
-            <span>AMOUNT</span>
-            <span id="p-amount">0.00</span>
-        </div>
-        
+        <div class="flex justify-between w-full font-bold mb-1 text-[14px]"><span>AMOUNT</span><span id="p-amount">0.00</span></div>
         <div class="w-full text-center overflow-hidden">================================</div>
         <div class="mb-5 w-full text-left">CUSTOMERNAME</div>
-        
         <div class="text-center w-full mt-4">SIGN</div>
         <div class="text-center w-full mb-3">______________________</div>
-        
-        <div class="flex flex-col items-center w-full mt-2">
-            <p class="text-[11px] mb-1">SCAN TO VOID</p>
-            <svg id="void-barcode"></svg>
-        </div>
-        
+        <div class="flex flex-col items-center w-full mt-2"><p class="text-[11px] mb-1">SCAN TO VOID</p><svg id="void-barcode"></svg></div>
         <div class="mt-4 text-center w-full text-[11px]">com.arke 1.19.49</div>
         <div class="text-center w-full text-[11px]">- - -MERCHANT COPY- - -</div>
     </div>
 
     <script>
         let amountStr = "0";
-        let timerInterval, pollingInterval, currentChargeId = null;
+        let timerTimeout, pollingInterval, currentChargeId = null;
 
         function pressKey(k) { if (amountStr.length < 8) { amountStr = amountStr === "0" ? k : amountStr + k; updateDisplay(); } }
         function pressClear() { amountStr = "0"; updateDisplay(); }
@@ -212,25 +162,34 @@
         
         function switchScreen(id) { 
             ['screen-keypad', 'screen-qr', 'screen-receipt'].forEach(s => {
-                document.getElementById(s).classList.add('hidden');
-                document.getElementById(s).classList.remove('flex');
+                document.getElementById(s).classList.add('hidden'); document.getElementById(s).classList.remove('flex');
             });
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
+            document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
         }
 
         function getPrintDateTime() {
             const now = new Date();
-            const d = String(now.getDate()).padStart(2, '0');
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const y = now.getFullYear() + 543;
-            const hh = String(now.getHours()).padStart(2, '0');
-            const mm = String(now.getMinutes()).padStart(2, '0');
-            const ss = String(now.getSeconds()).padStart(2, '0');
-            return `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()+543} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
         }
 
-        // 🟢 เรียก API เพื่อสร้างรายการขาย
+        // คำนวณเวลาหมดอายุ 5 นาที โชว์ตรงกล่องสีเหลือง
+        function setExpiryTime() {
+            let now = new Date();
+            now.setMinutes(now.getMinutes() + 5);
+            const pad = (n) => String(n).padStart(2, '0');
+            let hh = pad(now.getHours()); let mm = pad(now.getMinutes());
+            let d = pad(now.getDate()); let mon = pad(now.getMonth() + 1); let y = now.getFullYear() + 543;
+            document.getElementById('expire-time').innerText = `${hh}:${mm}, ${d}/${mon}/${y}`;
+            
+            // ตั้งเวลาให้หมดอายุอัตโนมัติ 5 นาที
+            timerTimeout = setTimeout(() => {
+                alert("หมดเวลาชำระเงิน กรุณาสร้าง QR ใหม่");
+                cancelTransaction();
+            }, 5 * 60 * 1000);
+        }
+
+        // 🟢 เรียก API เพื่อสร้างรายการ
         async function createSale() {
             let val = parseInt(amountStr, 10);
             if (val <= 0) return alert("ป้อนยอดเงินก่อน");
@@ -239,78 +198,77 @@
             document.getElementById('qr-amount').innerText = displayAmount;
             
             switchScreen('screen-qr');
-            startTimer();
-
-            // แสดงสถานะระหว่างรอโหลดจาก API
+            setExpiryTime();
             document.getElementById('qr-container').innerHTML = `<span class="text-gray-400 text-sm animate-pulse">กำลังเชื่อมต่อ API...</span>`;
 
             try {
-                // เรียก API ที่เชื่อมต่อไว้กับ Vercel
                 const res = await fetch("/api/create-charge", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ amount: val, currency: "THB", paymentMethod: "PROMPTPAY" })
                 });
 
-                if (!res.ok) throw new Error("API Connection Failed");
                 const data = await res.json();
 
-                if(data.qrCodeUrl && data.id) {
-                    currentChargeId = data.id;
-                    let realQR = data.qrCodeUrl;
+                // 🚨 ถ้า API ส่ง Error มา (เช่น ยอด 1 บาท ไม่ถึงขั้นต่ำ) จะโชว์ตรงนี้!!
+                if (!res.ok) {
+                    throw new Error(data.error || JSON.stringify(data.details) || "Beam ปฏิเสธการสร้าง QR");
+                }
 
-                    // แสดงภาพ QR ทันทีที่โหลดเสร็จ
+                // ดึงข้อมูลกรณีโครงสร้าง Response อาจซ้อนกัน (data.qrCodeUrl หรือ data.data.qrCodeUrl)
+                let realQR = data.qrCodeUrl || (data.data && data.data.qrCodeUrl);
+                let chargeId = data.id || (data.data && data.data.id);
+
+                if(realQR && chargeId) {
+                    currentChargeId = chargeId;
                     document.getElementById('qr-container').innerHTML = `<img id="qr-image-display" src="${realQR}" class="w-full h-full object-contain">`;
                     
-                    // เตรียมข้อมูลสำหรับพิมพ์ QR
                     document.getElementById('print-qr-amount').innerText = displayAmount;
                     document.getElementById('print-qr-image').src = realQR;
                     
-                    // เริ่มระบบตรวจสอบยอดเข้าอัตโนมัติ (Polling)
+                    // เริ่มระบบตรวจสอบยอดอัตโนมัติ
                     pollingInterval = setInterval(() => checkStatus(false), 3000);
                 } else {
-                    throw new Error("Invalid API Response");
+                    throw new Error("ระบบตอบกลับมาสำเร็จ แต่ไม่มีรูป QR Code (โครงสร้างข้อมูลผิด): " + JSON.stringify(data));
                 }
             } catch(e) {
-                console.error(e);
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาลองใหม่อีกครั้ง");
+                // โชว์ Error ที่แท้จริงบนหน้าจอ Sunmi จะได้รู้ว่าผิดตรงไหน
+                alert("เกิดข้อผิดพลาดจาก API:\n" + e.message);
                 cancelTransaction();
             }
         }
 
-        // 🟢 เรียก API เพื่อตรวจสอบสถานะการชำระเงิน
+        // 🟢 ตรวจสอบสถานะการชำระเงิน
         async function checkStatus(manual) {
             if (!currentChargeId) return;
-
             try {
                 const res = await fetch(`/api/check-status?id=${currentChargeId}`);
-                if (!res.ok) throw new Error("Check Status Error");
                 const data = await res.json();
                 
-                if (data.status === 'successful' || data.status === 'paid') {
-                    success(data.id);
+                // ตรวจสอบสถานะ (Beam อาจใช้คำว่า successful, paid, หรือ succeeded)
+                let status = data.status || (data.data && data.data.status);
+                
+                if (status === 'successful' || status === 'paid' || status === 'succeeded') {
+                    let realId = data.id || (data.data && data.data.id) || currentChargeId;
+                    success(realId);
                 } else if (manual) {
-                    alert("กรุณาตรวจสอบรายการอีกครั้ง ระบบยังไม่ได้รับยอดเงิน");
+                    alert("ตรวจสอบแล้ว ระบบยังไม่ได้รับยอดเงิน (สถานะปัจจุบัน: " + status + ")");
                 }
             } catch (e) {
-                if(manual) alert("เกิดข้อผิดพลาดในการตรวจสอบสถานะเครือข่าย");
+                if(manual) alert("เกิดข้อผิดพลาดในการตรวจสอบยอด: " + e.message);
             }
         }
 
-        // 🟢 กรณีชำระเงินสำเร็จ
         function success(refId) {
-            clearInterval(timerInterval); 
-            clearInterval(pollingInterval);
+            clearTimeout(timerTimeout); clearInterval(pollingInterval);
             
             let finalAmount = (parseInt(amountStr, 10)/100).toFixed(2);
             let traceId = Math.floor(100000 + Math.random()*900000);
             let refNo = refId.substring(0, 8).toUpperCase();
 
-            // อัปเดต UI หน้าจอ
             document.getElementById('ui-receipt-amount').innerText = finalAmount;
             document.getElementById('ui-receipt-ref').innerText = refNo;
 
-            // อัปเดตสลิปใบเสร็จ
             document.getElementById('p-amount').innerText = finalAmount;
             document.getElementById('p-trace').innerText = traceId;
             document.getElementById('p-ref').innerText = refNo;
@@ -320,36 +278,15 @@
             switchScreen('screen-receipt');
         }
 
-        // --- ควบคุมเวลา ---
-        function startTimer() {
-            let t = 300;
-            document.getElementById('timer').innerText = "05:00";
-            timerInterval = setInterval(() => {
-                let m = Math.floor(t/60), s = t%60;
-                document.getElementById('timer').innerText = `0${m}:${s<10?'0':''}${s}`;
-                if (--t < 0) { 
-                    cancelTransaction(); 
-                    alert("หมดเวลาทำรายการ กรุณาสร้าง QR ใหม่"); 
-                }
-            }, 1000);
-        }
-
-        // --- การควบคุมปุ่ม ---
         function cancelTransaction() { 
-            clearInterval(timerInterval); clearInterval(pollingInterval); currentChargeId = null; amountStr="0"; updateDisplay(); switchScreen('screen-keypad'); 
+            clearTimeout(timerTimeout); clearInterval(pollingInterval); currentChargeId = null; amountStr="0"; updateDisplay(); switchScreen('screen-keypad'); 
         }
-        
         function verifyTransaction() { checkStatus(true); }
-        
         function printQR() { 
             document.getElementById('print-qr-date').innerText = "Print Date: " + getPrintDateTime();
             document.body.classList.add('printing-qr'); window.print(); document.body.classList.remove('printing-qr'); 
         }
-        
-        function printReceipt() { 
-            document.body.classList.add('printing-receipt'); window.print(); document.body.classList.remove('printing-receipt'); 
-        }
-        
+        function printReceipt() { document.body.classList.add('printing-receipt'); window.print(); document.body.classList.remove('printing-receipt'); }
         function resetApp() { cancelTransaction(); }
     </script>
 </body>
