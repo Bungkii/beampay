@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -163,35 +164,45 @@
             return `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()+543} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
         }
 
+        // ค้นหาฟังก์ชัน createSale() ใน index.html แล้วแทนที่ส่วนที่รับข้อมูลตามนี้ครับ:
+
         async function createSale() {
             let val = parseInt(amountStr, 10);
             if (val <= 0) return alert("กรุณาป้อนยอดเงิน");
+            
             let displayAmt = (val/100).toFixed(2);
             document.getElementById('qr-amount').innerText = displayAmt;
             document.getElementById('p-amount-qr').innerText = displayAmt;
             switchScreen('screen-qr');
             
-            let exp = new Date(); exp.setMinutes(exp.getMinutes() + 5);
-            const pad = (n) => String(n).padStart(2, '0');
-            document.getElementById('expire-time').innerText = `${pad(exp.getHours())}:${pad(exp.getMinutes())}, ${pad(exp.getDate())}/${pad(exp.getMonth()+1)}/${exp.getFullYear()+543}`;
+            // แสดงสถานะระหว่างรอ
+            document.getElementById('qr-container').innerHTML = `<div class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl animate-pulse"><span class="text-gray-300 text-sm">กำลังสร้าง QR...</span></div>`;
 
             try {
                 const res = await fetch("/api/create-charge", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ amount: val, currency: "THB", paymentMethod: "PROMPTPAY" })
+                    body: JSON.stringify({ amount: val })
                 });
                 const data = await res.json();
                 
-                if (!res.ok) throw new Error(data.error || "ติดต่อธนาคารผู้ออกบัตร");
+                if (!res.ok) throw new Error(data.error || "เกิดข้อผิดพลาด");
 
-                currentChargeId = data.id;
-                document.getElementById('qr-container').innerHTML = `<img src="${data.qrCodeUrl}" class="w-full h-full object-contain rounded-xl">`;
-                document.getElementById('qr-print-img').innerHTML = `<img src="${data.qrCodeUrl}" style="width:45mm; height:45mm;">`;
-                document.getElementById('r-mid-ui').innerText = data.mid;
-                document.getElementById('p-mid').innerText = data.mid;
+                // ✅ ดึงรูปจาก encodedImage ตามคู่มือใหม่
+                if (data.actionRequired === "ENCODED_IMAGE" && data.encodedImage) {
+                    currentChargeId = data.chargeId;
+                    const base64QR = `data:image/png;base64,${data.encodedImage.imageBase64Encoded}`;
+                    
+                    document.getElementById('qr-container').innerHTML = `<img src="${base64QR}" class="w-full h-full object-contain rounded-xl">`;
+                    document.getElementById('qr-print-img').innerHTML = `<img src="${base64QR}" style="width:45mm; height:45mm;">`;
+                    
+                    document.getElementById('r-mid-ui').innerText = data.mid;
+                    document.getElementById('p-mid').innerText = data.mid;
 
-                pollingInterval = setInterval(() => checkStatus(false), 3000);
+                    pollingInterval = setInterval(() => checkStatus(false), 3000);
+                } else {
+                    throw new Error("Beam ไม่ส่งภาพ QR กลับมา (ActionRequired ไม่ใช่ ENCODED_IMAGE)");
+                }
             } catch (e) { 
                 document.getElementById('error-message').innerHTML = e.message + "<br>กรุณาลองใหม่อีกครั้ง";
                 switchScreen('screen-failed');
