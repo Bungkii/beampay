@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LandiEDC - BBLQR Layout</title>
+    <title>LandiEDC - BBLQR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
         <div class="bg-[#111c8a] text-white flex flex-col pt-6 pb-6 px-6 rounded-b-[2rem] shadow-md z-10">
             <div class="flex items-center mb-6">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                <h2 class="font-bold text-xl ml-4">รายการขาย</h2>
+                <h2 class="font-bold text-xl ml-4">รายการขาย QR</h2>
             </div>
             <div class="flex flex-col mb-2">
                 <span class="text-sm opacity-90 mb-1 font-medium">จำนวนเงิน</span>
@@ -106,7 +106,7 @@
             <img src="/src/promptpay.webp" class="h-8 mb-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
             
             <div id="qr-container" class="mb-6 border-4 border-slate-50 p-2 rounded-[2rem] bg-white shadow-xl active:scale-95 transition-transform" onclick="printQR()">
-                <div class="w-[260px] h-[260px] flex items-center justify-center bg-slate-50 rounded-2xl animate-pulse text-slate-300 text-sm font-bold uppercase">GENERATING...</div>
+                <div class="w-[260px] h-[260px] flex items-center justify-center bg-slate-50 rounded-2xl animate-pulse text-slate-300 text-sm font-bold uppercase">กำลังสร้าง QR....</div>
             </div>
 
             <div class="text-center mb-6">
@@ -118,7 +118,7 @@
             </div>
             
             <div class="bg-[#fffdf0] border border-yellow-100 rounded-2xl py-4 px-5 w-full text-center mb-6">
-                <p class="text-[14px] text-gray-800 font-semibold mb-1">ชำระเงินภายใน <span class="text-red-600 font-mono text-[16px]" id="expire-time">05:00</span> นาที</p>
+                <p class="text-[14px] text-gray-800 font-semibold mb-1">ดรุณาชำระเงินภายใน <span class="text-red-600 font-mono text-[16px]" id="expire-time">05:00</span> นาที</p>
             </div>
             
             <div class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-blue-50 rounded-2xl border border-blue-100 mb-10">
