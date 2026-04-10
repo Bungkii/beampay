@@ -11,6 +11,7 @@
     
     <style>
         body { font-family: 'IBM Plex Sans Thai', sans-serif; overscroll-behavior-y: none; background-color: #f3f4f6; }
+        
         .print-font { font-family: monospace; line-height: 1.2; font-size: 13px; }
         .loader { border-top-color: #3b82f6; animation: spinner 1s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -20,7 +21,7 @@
         @media print {
             @page { margin: 0; width: 58mm; }
             body { background: white; margin: 0; padding: 0; }
-            #screen-keypad, #screen-qr, #screen-receipt { display: none !important; }
+            #screen-keypad, #screen-qr, #screen-receipt, #screen-failed { display: none !important; }
             body.printing-qr #print-qr-slip { display: block !important; width: 58mm; padding: 2mm; margin: 0; color: black; }
             body.printing-receipt #print-receipt-slip { display: block !important; width: 58mm; padding: 2mm; margin: 0; color: black; }
         }
@@ -72,7 +73,7 @@
 
                 <div class="cursor-pointer mb-4" onclick="printQR()" title="คลิกเพื่อพิมพ์ QR Code">
                     <div id="qr-container" class="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 rounded-xl border border-gray-100">
-                        <span class="text-gray-400 text-sm animate-pulse">กำลังดึงข้อมูล...</span>
+                        <span class="text-gray-400 text-sm animate-pulse">กำลังเชื่อมต่อ API...</span>
                     </div>
                 </div>
 
@@ -125,6 +126,23 @@
         </div>
     </div>
 
+    <div id="screen-failed" class="hidden flex-col h-full bg-gray-200 overflow-y-auto relative items-center justify-center p-4">
+        <div class="bg-white p-8 shadow-2xl w-full max-w-[320px] rounded-[24px] text-center flex flex-col items-center">
+            
+            <img src="src/payment_failed.2b608957.svg" alt="Payment Failed" class="w-32 h-32 mb-6 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/753/753345.png'">
+
+            <h3 class="font-bold text-[22px] mb-3 text-gray-800 tracking-tight">ชำระเงินไม่สำเร็จ</h3>
+            
+            <p class="text-gray-500 text-[14px] mb-8 leading-relaxed">
+                ขออภัย เราไม่สามารถดำเนินการชำระเงินได้<br>กรุณาติดต่อธนาคารและลองใหม่อีกครั้ง
+            </p>
+
+            <button class="w-full bg-[#0a1b4d] text-white font-bold py-3.5 rounded-xl text-[16px] shadow-sm active:bg-[#071336] transition" onclick="resetApp()">
+                ปิด
+            </button>
+        </div>
+    </div>
+
     <div id="print-qr-slip" class="print-font">
         <div class="text-center font-bold text-[14px] mb-1">ชำระเงินผ่าน QR Promptpay</div>
         <div class="w-full overflow-hidden text-center">================================</div>
@@ -161,10 +179,14 @@
         function updateDisplay() { document.getElementById('amountDisplay').innerText = (parseInt(amountStr, 10)/100).toFixed(2); }
         
         function switchScreen(id) { 
-            ['screen-keypad', 'screen-qr', 'screen-receipt'].forEach(s => {
-                document.getElementById(s).classList.add('hidden'); document.getElementById(s).classList.remove('flex');
+            // ซ่อนทุกหน้าต่าง
+            ['screen-keypad', 'screen-qr', 'screen-receipt', 'screen-failed'].forEach(s => {
+                document.getElementById(s).classList.add('hidden'); 
+                document.getElementById(s).classList.remove('flex');
             });
-            document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
+            // โชว์หน้าต่างที่เลือก
+            document.getElementById(id).classList.remove('hidden'); 
+            document.getElementById(id).classList.add('flex');
         }
 
         function getPrintDateTime() {
@@ -173,7 +195,6 @@
             return `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()+543} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
         }
 
-        // คำนวณเวลาหมดอายุ 5 นาที โชว์ตรงกล่องสีเหลือง
         function setExpiryTime() {
             let now = new Date();
             now.setMinutes(now.getMinutes() + 5);
@@ -182,11 +203,16 @@
             let d = pad(now.getDate()); let mon = pad(now.getMonth() + 1); let y = now.getFullYear() + 543;
             document.getElementById('expire-time').innerText = `${hh}:${mm}, ${d}/${mon}/${y}`;
             
-            // ตั้งเวลาให้หมดอายุอัตโนมัติ 5 นาที
             timerTimeout = setTimeout(() => {
-                alert("หมดเวลาชำระเงิน กรุณาสร้าง QR ใหม่");
-                cancelTransaction();
+                showFailedScreen();
             }, 5 * 60 * 1000);
+        }
+
+        // 🟢 เปลี่ยนจาก alert เป็นเรียกหน้าจอ failed
+        function showFailedScreen() {
+            clearTimeout(timerTimeout); 
+            clearInterval(pollingInterval);
+            switchScreen('screen-failed');
         }
 
         // 🟢 เรียก API เพื่อสร้างรายการ
@@ -210,12 +236,12 @@
 
                 const data = await res.json();
 
-                // 🚨 ถ้า API ส่ง Error มา (เช่น ยอด 1 บาท ไม่ถึงขั้นต่ำ) จะโชว์ตรงนี้!!
+                // 🚨 หากเกิด Error เช่น ยอดเงินไม่ถึงขั้นต่ำ หรือเครือข่ายพัง ไปหน้า Failed ทันที
                 if (!res.ok) {
-                    throw new Error(data.error || JSON.stringify(data.details) || "Beam ปฏิเสธการสร้าง QR");
+                    console.error("Beam Error:", data);
+                    throw new Error("Payment gateway rejected");
                 }
 
-                // ดึงข้อมูลกรณีโครงสร้าง Response อาจซ้อนกัน (data.qrCodeUrl หรือ data.data.qrCodeUrl)
                 let realQR = data.qrCodeUrl || (data.data && data.data.qrCodeUrl);
                 let chargeId = data.id || (data.data && data.data.id);
 
@@ -226,15 +252,13 @@
                     document.getElementById('print-qr-amount').innerText = displayAmount;
                     document.getElementById('print-qr-image').src = realQR;
                     
-                    // เริ่มระบบตรวจสอบยอดอัตโนมัติ
                     pollingInterval = setInterval(() => checkStatus(false), 3000);
                 } else {
-                    throw new Error("ระบบตอบกลับมาสำเร็จ แต่ไม่มีรูป QR Code (โครงสร้างข้อมูลผิด): " + JSON.stringify(data));
+                    throw new Error("Invalid structure");
                 }
             } catch(e) {
-                // โชว์ Error ที่แท้จริงบนหน้าจอ Sunmi จะได้รู้ว่าผิดตรงไหน
-                alert("เกิดข้อผิดพลาดจาก API:\n" + e.message);
-                cancelTransaction();
+                // เด้งไปหน้าชำระเงินไม่สำเร็จ
+                showFailedScreen();
             }
         }
 
@@ -245,17 +269,21 @@
                 const res = await fetch(`/api/check-status?id=${currentChargeId}`);
                 const data = await res.json();
                 
-                // ตรวจสอบสถานะ (Beam อาจใช้คำว่า successful, paid, หรือ succeeded)
                 let status = data.status || (data.data && data.data.status);
                 
                 if (status === 'successful' || status === 'paid' || status === 'succeeded') {
                     let realId = data.id || (data.data && data.data.id) || currentChargeId;
                     success(realId);
-                } else if (manual) {
-                    alert("ตรวจสอบแล้ว ระบบยังไม่ได้รับยอดเงิน (สถานะปัจจุบัน: " + status + ")");
+                } 
+                // ถ้าระบบตอบกลับมาว่า Failed หรือ Canceled โชว์หน้าชำระไม่สำเร็จ
+                else if (status === 'failed' || status === 'canceled' || status === 'expired') {
+                    showFailedScreen();
+                }
+                else if (manual) {
+                    alert("สถานะปัจจุบัน: กำลังรอการชำระเงิน (" + status + ")");
                 }
             } catch (e) {
-                if(manual) alert("เกิดข้อผิดพลาดในการตรวจสอบยอด: " + e.message);
+                if(manual) showFailedScreen();
             }
         }
 
@@ -287,6 +315,8 @@
             document.body.classList.add('printing-qr'); window.print(); document.body.classList.remove('printing-qr'); 
         }
         function printReceipt() { document.body.classList.add('printing-receipt'); window.print(); document.body.classList.remove('printing-receipt'); }
+        
+        // ปุ่มปิด ในหน้าจอชำระเงินไม่สำเร็จ
         function resetApp() { cancelTransaction(); }
     </script>
 </body>
