@@ -20,10 +20,8 @@
         @media print {
             @page { margin: 0 !important; size: 58mm auto; }
             body { background: white; margin: 0 !important; padding: 0 !important; width: 58mm !important; -webkit-print-color-adjust: exact; overflow: hidden !important; }
-            /* ซ่อนทุกหน้าจอ UI */
             #screen-login, #screen-home, #screen-keypad, #screen-qr, #screen-receipt, #screen-failed, #screen-cash-change, #screen-history, #screen-reprint, #screen-summary, #screen-void { display: none !important; }
             
-            /* แสดงเฉพาะสลิปที่สั่งพิมพ์ */
             body.printing-qr #print-qr-slip, 
             body.printing-receipt #print-receipt-slip,
             body.printing-settlement #print-settlement-slip { 
@@ -38,7 +36,7 @@
 
     <div id="screen-login" class="flex flex-col h-full bg-slate-200 w-full max-w-md shadow-2xl relative">
         <div class="bg-[#111c8a] text-white flex flex-col items-center pt-10 pb-8 px-6 rounded-b-[2rem] shadow-md z-10">
-            <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-4 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
+            <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-6 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
             <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">กรุณากรอก PIN</h2>
         </div>
         <div class="px-6 py-10 flex flex-col justify-center items-center bg-slate-50 flex-none h-1/4 border-b relative">
@@ -77,8 +75,8 @@
 
     <div id="screen-home" class="hidden flex-col h-full bg-slate-50 w-full max-w-md shadow-2xl relative">
         <div class="bg-[#111c8a] text-white flex flex-col items-center pt-10 pb-8 px-6 rounded-b-[2rem] shadow-md z-10">
-            <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-4 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
-            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">Bangkok Bank</h2>
+            <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-6 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
+            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">BANGKOK BANK</h2>
         </div>
         <div class="flex-1 p-5 overflow-y-auto grid grid-cols-2 gap-4 content-start">
             <button onclick="startQRSale()" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform active:bg-blue-50">
@@ -137,7 +135,7 @@
                 <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10"></rect></svg>
             </div>
             <h3 class="font-bold text-2xl text-slate-800 mb-2">แสกนบาร์โค้ด</h3>
-            <p class="text-slate-500 mb-8">กดปุ่มแสกนที่ข้างเครื่อง Sunmi<br>เพื่อแสกนบาร์โค้ด <b>VOID</b> ท้ายใบเสร็จ</p>
+            <p class="text-slate-500 mb-8">กดปุ่มแสกนที่ข้างเครื่อง<br>เพื่อแสกนบาร์โค้ด <b>VOID</b> ท้ายใบเสร็จ</p>
             
             <div class="bg-white border rounded-xl p-4 w-full shadow-sm">
                 <p class="text-xs text-slate-400 mb-1 uppercase font-bold">สถานะ</p>
@@ -204,7 +202,7 @@
     <div id="screen-qr" class="hidden flex-col h-full bg-white w-full max-w-md relative">
         <div class="bg-[#f0f2f5] px-6 py-5 flex items-center border-b shadow-sm">
             <button onclick="cancelTransaction()" class="text-gray-500 p-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">PROMPTPAY QR</div>
+            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">คิวอาร์เพย์เมนต์</div>
         </div>
         <div class="flex-1 flex flex-col items-center p-6 overflow-y-auto">
             
@@ -301,18 +299,26 @@
             <h2 class="font-bold text-lg uppercase tracking-wider">สรุปยอด (SETTLEMENT)</h2>
         </div>
         <div class="flex-1 overflow-y-auto p-6">
+            
+            <div class="bg-red-50 rounded-2xl shadow-sm border border-red-100 p-6 mb-6">
+                <h3 class="font-bold text-red-600 mb-4 border-b border-red-200 pb-2">รายการยกเลิก (VOID)</h3>
+                <div class="flex justify-between mb-2 text-sm text-red-500"><span>จำนวนรายการ:</span><span id="sum-void-count" class="font-bold">0</span></div>
+                <div class="flex justify-between font-bold text-lg text-red-600"><span>ยอดรวมถูกยกเลิก:</span><span id="sum-void-amt">0.00</span></div>
+            </div>
+
             <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขาย QR PROMPTPAY</h3>
+                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขายสุทธิ QR PROMPTPAY</h3>
                 <div class="flex justify-between mb-2 text-sm text-slate-600"><span>จำนวนรายการ:</span><span id="sum-qr-count" class="font-bold">0</span></div>
                 <div class="flex justify-between font-bold text-lg text-[#111c8a]"><span>ยอดรวม:</span><span id="sum-qr-amt">0.00</span></div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขาย เงินสด (CASH)</h3>
+                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขายสุทธิ เงินสด (CASH)</h3>
                 <div class="flex justify-between mb-2 text-sm text-slate-600"><span>จำนวนรายการ:</span><span id="sum-cash-count" class="font-bold">0</span></div>
                 <div class="flex justify-between font-bold text-lg text-green-600"><span>ยอดรวม:</span><span id="sum-cash-amt">0.00</span></div>
             </div>
+            
             <div class="bg-[#111c8a] text-white rounded-2xl shadow-md p-6 flex flex-col items-center">
-                <span class="text-sm opacity-80 mb-1">ยอดรวมทั้งสิ้น (GRAND TOTAL)</span>
+                <span class="text-sm opacity-80 mb-1">ยอดขายสุทธิทั้งสิ้น (GRAND TOTAL)</span>
                 <span id="sum-grand-amt" class="text-4xl font-bold tracking-tighter">0.00</span>
             </div>
         </div>
@@ -361,22 +367,28 @@
         <div style="display:flex; justify-content:space-between;"><span>MID:</span><span>BBL0123456</span></div>
         <div style="display:flex; justify-content:space-between;"><span>TID:</span><span>012D4514</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
-        <div style="font-weight:bold; margin-top:5px;">QR PROMPTPAY</div>
+        
+        <div style="font-weight:bold; margin-top:5px;">VOIDED (ยกเลิกรายการ)</div>
+        <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-void-count">0</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-void-amt">0.00</span></div>
+        <div style="text-align:center; margin-top:5px;">--------------------------</div>
+        
+        <div style="font-weight:bold; margin-top:5px;">NET QR PROMPTPAY</div>
         <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-qr-count">0</span></div>
         <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-qr-amt">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
-        <div style="font-weight:bold; margin-top:5px;">CASH</div>
+        
+        <div style="font-weight:bold; margin-top:5px;">NET CASH</div>
         <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-cash-count">0</span></div>
         <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-cash-amt">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">===========================</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>GRAND TOTAL</span><span id="s-grand-amt">0.00</span></div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>NET GRAND TOTAL</span><span id="s-grand-amt">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">===========================</div>
         <div style="text-align:center; font-size:9px; margin-top:15px;">-- END OF SETTLEMENT --</div>
         <div class="paper-feed"></div>
     </div>
 
     <script>
-        // ================= GLOBAL STATE & LOCAL STORAGE =================
         let transactions = JSON.parse(localStorage.getItem('edc_transactions')) || []; 
         let pinStr = "";
         const correctPin = "111111";
@@ -388,7 +400,6 @@
         let keypadMode = 'QR'; 
         let cashAmountToPay = 0;
 
-        // ดึง URL รูปภาพ Thai QR 
         const thaiQrLogoSrc = "/src/icon-thaiqr.png";
         const thaiQrLogoFallback = "https://www.bot.or.th/content/dam/bot/icons/icon-thaiqr.png";
 
@@ -516,7 +527,6 @@
             switchScreen('screen-qr');
             startCountdown();
 
-            // แทรกโลโก้ Thai QR ไปตรงกลางผ่าน HTML/CSS
             const centerLogoHtml = `<img src="${thaiQrLogoSrc}" onerror="this.src='${thaiQrLogoFallback}'" class="absolute inset-0 m-auto w-12 h-12 bg-white p-1 rounded-md z-10 shadow-sm border border-gray-100">`;
 
             try {
@@ -529,13 +539,11 @@
                 currentChargeId = data.chargeId;
                 const base64QR = `data:image/png;base64,${data.encodedImage}`;
                 
-                // สำหรับหน้าจอ UI (ใส่ซ้อนตรงกลาง)
                 document.getElementById('qr-container').innerHTML = `
                     <img src="${base64QR}" class="w-full h-full object-contain rounded-xl relative z-0">
                     ${centerLogoHtml}
                 `;
                 
-                // สำหรับหน้าปริ้นท์ (ใช้ Absolute ของ Inline Style เพื่อให้เครื่องปริ้นเข้าใจง่าย)
                 document.getElementById('qr-print-img').innerHTML = `
                     <div style="position: relative; display: inline-block; width: 40mm; height: 40mm;">
                         <img src="${base64QR}" style="width: 40mm; height: 40mm; display: block; margin: auto;">
@@ -728,19 +736,35 @@
 
         function showSettlement() {
             let qrCount = 0, qrAmt = 0, cashCount = 0, cashAmt = 0;
+            let voidCount = 0, voidAmt = 0;
+
+            // คํานวณแยกยอดขายสุทธิ และยอดที่ถูกยกเลิก
             transactions.forEach(t => {
-                if (t.isVoided) return; 
-                if(t.type === 'QR') { qrCount++; qrAmt += t.amount; }
-                else if(t.type === 'CASH') { cashCount++; cashAmt += t.amount; }
+                if (t.isVoided) {
+                    voidCount++;
+                    voidAmt += t.amount;
+                } else {
+                    if(t.type === 'QR') { qrCount++; qrAmt += t.amount; }
+                    else if(t.type === 'CASH') { cashCount++; cashAmt += t.amount; }
+                }
             });
             
+            // อัปเดต UI หน้าจอ
+            document.getElementById('sum-void-count').innerText = voidCount;
+            document.getElementById('sum-void-amt').innerText = formatAmount(voidAmt);
+
             document.getElementById('sum-qr-count').innerText = qrCount;
             document.getElementById('sum-qr-amt').innerText = formatAmount(qrAmt);
             document.getElementById('sum-cash-count').innerText = cashCount;
             document.getElementById('sum-cash-amt').innerText = formatAmount(cashAmt);
             document.getElementById('sum-grand-amt').innerText = formatAmount(qrAmt + cashAmt);
             
+            // เตรียมข้อมูลสำหรับสลิป
             document.getElementById('s-date').innerText = new Date().toLocaleString('th-TH');
+            
+            document.getElementById('s-void-count').innerText = voidCount;
+            document.getElementById('s-void-amt').innerText = formatAmount(voidAmt);
+
             document.getElementById('s-qr-count').innerText = qrCount;
             document.getElementById('s-qr-amt').innerText = formatAmount(qrAmt);
             document.getElementById('s-cash-count').innerText = cashCount;
