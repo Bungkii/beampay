@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LandiEDC - BBL (Flutter Ready)</title>
+    <title>LandiEDC - BBLQR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -139,10 +139,10 @@
                 <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10"></rect></svg>
             </div>
             <h3 class="font-bold text-2xl text-slate-800 mb-2">แสกนบาร์โค้ด</h3>
-            <p class="text-slate-500 mb-8">กดปุ่มแสกนที่ข้างเครื่อง Sunmi<br>เพื่อแสกนบาร์โค้ด <b>VOID</b> ท้ายใบเสร็จ</p>
+            <p class="text-slate-500 mb-8">กดปุ่มแสกนที่ข้างเครื่อง<br>เพื่อแสกนบาร์โค้ด <b>VOID</b> ท้ายใบเสร็จ</p>
             <div class="bg-white border rounded-xl p-4 w-full shadow-sm">
                 <p class="text-xs text-slate-400 mb-1 uppercase font-bold">สถานะ</p>
-                <div id="void-status" class="text-lg font-bold text-slate-400">รอรับข้อมูลแสกน...</div>
+                <div id="void-status" class="text-lg font-bold text-slate-400">กรุณาแสกนบาร์โค้ดที่ เซลล์สลิป....</div>
             </div>
         </div>
     </div>
@@ -151,7 +151,7 @@
         <div class="bg-[#111c8a] text-white flex flex-col pt-6 pb-6 px-6 rounded-b-[2rem] shadow-md z-10">
             <div class="flex items-center mb-6">
                 <button onclick="resetToHome()" class="p-1 mr-2 opacity-80 active:opacity-100"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-                <h2 id="keypad-title" class="font-bold text-xl uppercase">คิวอาร์เพย์เมนต์</h2>
+                <h2 id="keypad-title" class="font-bold text-xl uppercase">ชำระเงินผ่านคิวอาร์เพย์เมนต์</h2>
             </div>
             <div class="flex flex-col mb-2">
                 <span class="text-sm opacity-90 mb-1 font-medium">จำนวนเงิน (บาท)</span>
@@ -183,11 +183,10 @@
     <div id="screen-qr" class="hidden flex-col h-full bg-white w-full max-w-md relative">
         <div class="bg-[#f0f2f5] px-6 py-5 flex items-center border-b shadow-sm">
             <button onclick="cancelTransaction()" class="text-gray-500 p-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">คิวอาร์เพย์เมนต์</div>
+            <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">ชำระเงินผ่านคิวอาร์เพย์เมนต์</div>
         </div>
         <div class="flex-1 flex flex-col items-center p-6 overflow-y-auto">
             <div class="flex items-center gap-3 mb-6">
-                <img src="/src/icon-thaiqr.png" onerror="this.src='https://www.bot.or.th/content/dam/bot/icons/icon-thaiqr.png'" class="h-8 object-contain">
                 <img src="/src/promptpay.webp" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'" class="h-6 object-contain">
             </div>
             <div id="qr-container" class="mb-6 border-4 border-slate-50 p-2 rounded-[2rem] bg-white shadow-xl active:scale-95 transition-transform relative" onclick="printQR()">
@@ -237,7 +236,7 @@
         <div class="flex-1 p-6 flex flex-col items-center bg-gray-50">
             <div class="bg-white p-8 shadow-xl rounded-3xl border w-full mb-8 flex flex-col items-center text-center">
                 <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                <h3 class="font-bold text-lg text-slate-800 uppercase">ทำรายการเสร็จสิ้น</h3>
+                <h3 class="font-bold text-lg text-slate-800 uppercase">รายการอนุมัติ</h3>
                 <p id="r-amount-display" class="text-5xl font-bold text-gray-900 my-6 tracking-tighter">0.00</p>
                 <div class="w-full border-t border-dashed border-gray-200 pt-6 text-[12px] text-gray-400 space-y-2 text-left">
                     <p class="flex justify-between"><span>TYPE:</span><span id="r-type-ui" class="font-bold text-[#111c8a]">QR</span></p>
@@ -299,7 +298,7 @@
                 <div class="flex justify-between font-bold text-lg text-[#111c8a]"><span>ยอดรวม:</span><span id="sum-qr-amt">0.00</span></div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขายสุทธิ เงินสด (CASH)</h3>
+                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">ยอดขายสุทธิ เงินสด</h3>
                 <div class="flex justify-between mb-2 text-sm text-slate-600"><span>จำนวนรายการ:</span><span id="sum-cash-count" class="font-bold">0</span></div>
                 <div class="flex justify-between font-bold text-lg text-green-600"><span>ยอดรวม:</span><span id="sum-cash-amt">0.00</span></div>
             </div>
@@ -333,7 +332,7 @@
         <div style="display:flex; justify-content:space-between;"><span>BATCH:</span><span id="p-batch">001032</span></div>
         <div style="display:flex; justify-content:space-between;"><span>TRACE:</span><span id="p-trace">--</span></div>
         <div style="display:flex; justify-content:space-between;"><span>REF#:</span><span id="p-ref">--</span></div>
-        <div style="text-align:center; margin-top:5px; font-weight:bold;">SALE(POS)</div>
+        <div style="text-align:center; margin-top:5px; font-weight:bold;">SALE</div>
         <div id="p-pay-type" style="margin-top:5px; font-weight:bold;">PROMPTPAY</div>
         <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>TOTAL THB</span><span id="p-amount">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
@@ -354,17 +353,17 @@
         <div style="display:flex; justify-content:space-between;"><span>TID:</span><span>012D4514</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
         
-        <div style="font-weight:bold; margin-top:5px;">VOIDED (ยกเลิกรายการ)</div>
+        <div style="font-weight:bold; margin-top:5px;">VOIDED</div>
         <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-void-count-slip">0</span></div>
         <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-void-amt-slip">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
         
-        <div style="font-weight:bold; margin-top:5px;">NET QR PROMPTPAY</div>
+        <div style="font-weight:bold; margin-top:5px;">QR PROMPTPAY</div>
         <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-qr-count-slip">0</span></div>
         <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-qr-amt-slip">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">--------------------------</div>
         
-        <div style="font-weight:bold; margin-top:5px;">NET CASH</div>
+        <div style="font-weight:bold; margin-top:5px;">CASH</div>
         <div style="display:flex; justify-content:space-between;"><span>COUNT:</span><span id="s-cash-count-slip">0</span></div>
         <div style="display:flex; justify-content:space-between;"><span>AMOUNT:</span><span id="s-cash-amt-slip">0.00</span></div>
         <div style="text-align:center; margin-top:5px;">===========================</div>
