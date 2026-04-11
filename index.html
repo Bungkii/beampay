@@ -21,7 +21,7 @@
             @page { margin: 0 !important; size: 58mm auto; }
             body { background: white; margin: 0 !important; padding: 0 !important; width: 58mm !important; -webkit-print-color-adjust: exact; overflow: hidden !important; }
             /* ซ่อนทุกหน้าจอ UI */
-            #screen-login, #screen-home, #screen-keypad, #screen-qr, #screen-receipt, #screen-failed, #screen-cash-change, #screen-history, #screen-reprint, #screen-summary { display: none !important; }
+            #screen-login, #screen-home, #screen-keypad, #screen-qr, #screen-receipt, #screen-failed, #screen-cash-change, #screen-history, #screen-reprint, #screen-summary, #screen-void { display: none !important; }
             
             /* แสดงเฉพาะสลิปที่สั่งพิมพ์ */
             body.printing-qr #print-qr-slip, 
@@ -39,7 +39,7 @@
     <div id="screen-login" class="flex flex-col h-full bg-slate-200 w-full max-w-md shadow-2xl relative">
         <div class="bg-[#111c8a] text-white flex flex-col items-center pt-10 pb-8 px-6 rounded-b-[2rem] shadow-md z-10">
             <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-4 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
-            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">เข้าสู่ระบบ</h2>
+            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">กรุณากรอก PIN</h2>
         </div>
         <div class="px-6 py-10 flex flex-col justify-center items-center bg-slate-50 flex-none h-1/4 border-b relative">
             <span class="text-slate-400 font-bold mb-4 text-xs uppercase tracking-widest">Please Enter Password</span>
@@ -78,20 +78,20 @@
     <div id="screen-home" class="hidden flex-col h-full bg-slate-50 w-full max-w-md shadow-2xl relative">
         <div class="bg-[#111c8a] text-white flex flex-col items-center pt-10 pb-8 px-6 rounded-b-[2rem] shadow-md z-10">
             <img src="/src/bbllogo.png" alt="BBL Logo" class="h-16 mb-4 object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bangkok_Bank_logo.svg/1024px-Bangkok_Bank_logo.svg.png'">
-            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">ระบบจัดการร้านค้า</h2>
+            <h2 class="font-bold text-lg tracking-widest uppercase opacity-90">Bangkok Bank</h2>
         </div>
         <div class="flex-1 p-5 overflow-y-auto grid grid-cols-2 gap-4 content-start">
             <button onclick="startQRSale()" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform active:bg-blue-50">
-                <div class="w-12 h-12 bg-blue-100 text-[#111c8a] rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+                <div class="w-14 h-14 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+                    <img src="/src/icon-thaiqr.png" onerror="this.src='https://www.bot.or.th/content/dam/bot/icons/icon-thaiqr.png'" class="w-10 h-10 object-contain">
                 </div>
                 <span class="text-sm font-bold text-slate-700">ทำรายการขาย QR</span>
             </button>
             <button onclick="startCashSale()" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform active:bg-green-50">
-                <div class="w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
+                <div class="w-14 h-14 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
                 </div>
-                <span class="text-sm font-bold text-slate-700">ทำรายการด้วยงินสด</span>
+                <span class="text-sm font-bold text-slate-700">ทำรายการด้วยเงินสด</span>
             </button>
             <button onclick="showHistory()" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform active:bg-slate-100">
                 <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center">
@@ -116,9 +116,9 @@
             </button>
         </div>
         <div class="p-4 grid grid-cols-2 gap-3 border-t bg-white shrink-0">
-            <button class="flex items-center justify-center gap-2 text-slate-500 font-bold text-sm py-4 bg-slate-100 rounded-xl active:bg-slate-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                ล็อกหน้าจอ
+            <button onclick="startVoid()" class="flex items-center justify-center gap-2 text-orange-500 font-bold text-sm py-4 bg-orange-50 rounded-xl active:bg-orange-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                ยกเลิกรายการ
             </button>
             <button onclick="logout()" class="flex items-center justify-center gap-2 text-red-400 font-bold text-sm py-4 bg-red-50 rounded-xl active:bg-red-100 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -127,14 +127,33 @@
         </div>
     </div>
 
+    <div id="screen-void" class="hidden flex-col h-full bg-slate-50 w-full max-w-md relative">
+        <div class="bg-[#111c8a] text-white flex items-center px-4 py-6 shadow-md z-10 shrink-0">
+            <button onclick="resetToHome()" class="p-2 mr-2 active:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <h2 class="font-bold text-lg uppercase tracking-wider">ยกเลิกรายการ (VOID)</h2>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div class="w-24 h-24 bg-blue-50 text-[#111c8a] rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10"></rect></svg>
+            </div>
+            <h3 class="font-bold text-2xl text-slate-800 mb-2">แสกนบาร์โค้ด</h3>
+            <p class="text-slate-500 mb-8">กดปุ่มแสกนที่ข้างเครื่อง Sunmi<br>เพื่อแสกนบาร์โค้ด <b>VOID</b> ท้ายใบเสร็จ</p>
+            
+            <div class="bg-white border rounded-xl p-4 w-full shadow-sm">
+                <p class="text-xs text-slate-400 mb-1 uppercase font-bold">สถานะ</p>
+                <div id="void-status" class="text-lg font-bold text-slate-400">รอรับข้อมูลแสกน...</div>
+            </div>
+        </div>
+    </div>
+
     <div id="screen-keypad" class="hidden flex-col h-full bg-slate-200 w-full max-w-md shadow-2xl relative">
         <div class="bg-[#111c8a] text-white flex flex-col pt-6 pb-6 px-6 rounded-b-[2rem] shadow-md z-10">
             <div class="flex items-center mb-6">
                 <button onclick="resetToHome()" class="p-1 mr-2 opacity-80 active:opacity-100"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-                <h2 id="keypad-title" class="font-bold text-xl uppercase">SALE QR PAYMENT</h2>
+                <h2 id="keypad-title" class="font-bold text-xl uppercase">คิวอาร์เพย์เมนต์</h2>
             </div>
             <div class="flex flex-col mb-2">
-                <span class="text-sm opacity-90 mb-1 font-medium">AMOUNT (บาท)</span>
+                <span class="text-sm opacity-90 mb-1 font-medium">จำนวนเงิน (บาท)</span>
                 <div class="flex justify-between items-baseline border-b border-white/40 pb-2">
                     <span class="text-2xl font-medium">฿</span>
                     <span id="amountDisplay" class="text-[3.5rem] leading-none font-bold tracking-tighter">0.00</span>
@@ -188,9 +207,13 @@
             <div class="flex-1 text-center pr-8 font-bold text-sm text-[#4b5563] uppercase">PROMPTPAY QR</div>
         </div>
         <div class="flex-1 flex flex-col items-center p-6 overflow-y-auto">
-            <img src="/src/promptpay.webp" class="h-8 mb-6" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'">
             
-            <div id="qr-container" class="mb-6 border-4 border-slate-50 p-2 rounded-[2rem] bg-white shadow-xl active:scale-95 transition-transform" onclick="printQR()">
+            <div class="flex items-center gap-3 mb-6">
+                <img src="/src/icon-thaiqr.png" onerror="this.src='https://www.bot.or.th/content/dam/bot/icons/icon-thaiqr.png'" class="h-8 object-contain">
+                <img src="/src/promptpay.webp" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PromptPay-logo.png/1200px-PromptPay-logo.png'" class="h-6 object-contain">
+            </div>
+            
+            <div id="qr-container" class="mb-6 border-4 border-slate-50 p-2 rounded-[2rem] bg-white shadow-xl active:scale-95 transition-transform relative" onclick="printQR()">
                 <div class="w-[260px] h-[260px] flex items-center justify-center bg-slate-50 rounded-2xl animate-pulse text-slate-300 text-sm font-bold uppercase">GENERATING...</div>
             </div>
 
@@ -362,8 +385,12 @@
         let pollingInterval, currentChargeId = null;
         let countdownTimer = null;
         
-        let keypadMode = 'QR'; // โหมดคีย์แพด: 'QR', 'CASH_PAY', 'CASH_RECV'
+        let keypadMode = 'QR'; 
         let cashAmountToPay = 0;
+
+        // ดึง URL รูปภาพ Thai QR 
+        const thaiQrLogoSrc = "/src/icon-thaiqr.png";
+        const thaiQrLogoFallback = "https://www.bot.or.th/content/dam/bot/icons/icon-thaiqr.png";
 
         function saveTransactions() {
             localStorage.setItem('edc_transactions', JSON.stringify(transactions));
@@ -376,7 +403,6 @@
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        // ================= LOGIN LOGIC =================
         function checkLoginState() {
             if (localStorage.getItem('edc_logged_in') === 'true') {
                 switchScreen('screen-home');
@@ -396,7 +422,7 @@
         function attemptLogin() {
             if (pinStr === correctPin) {
                 pinStr = ""; updatePinDisplay(); 
-                localStorage.setItem('edc_logged_in', 'true'); // บันทึกการล็อกอิน
+                localStorage.setItem('edc_logged_in', 'true'); 
                 switchScreen('screen-home');
             } else {
                 alert("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่"); clearPin();
@@ -406,13 +432,12 @@
         function hideForgotPopup() { document.getElementById('popup-forgot').classList.add('hidden'); }
         function logout() { 
             clearPin(); 
-            localStorage.removeItem('edc_logged_in'); // ล้างการล็อกอิน
+            localStorage.removeItem('edc_logged_in'); 
             switchScreen('screen-login'); 
         }
 
-        // ================= SCREEN MANAGEMENT =================
         function switchScreen(id) { 
-            ['screen-login', 'screen-home', 'screen-keypad', 'screen-qr', 'screen-receipt', 'screen-failed', 'screen-cash-change', 'screen-history', 'screen-reprint', 'screen-summary'].forEach(s => {
+            ['screen-login', 'screen-home', 'screen-keypad', 'screen-qr', 'screen-receipt', 'screen-failed', 'screen-cash-change', 'screen-history', 'screen-reprint', 'screen-summary', 'screen-void'].forEach(s => {
                 document.getElementById(s).classList.add('hidden'); document.getElementById(s).classList.remove('flex');
             });
             document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
@@ -421,11 +446,10 @@
         function resetToHome() {
             clearInterval(pollingInterval);
             clearInterval(countdownTimer);
-            currentChargeId = null; amountStr = "0";
+            currentChargeId = null; amountStr = "0"; voidBarcodeBuffer = "";
             switchScreen('screen-home');
         }
 
-        // ================= KEYPAD LOGIC =================
         function pressKey(k) { 
             if (amountStr.length < 8) { 
                 if (amountStr === "0") { amountStr = (k === "00" || k === "000") ? "0" : k; } 
@@ -440,7 +464,6 @@
             document.getElementById('amountDisplay').innerText = val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); 
         }
 
-        // ================= FLOW ROUTING =================
         function startQRSale() {
             keypadMode = 'QR'; amountStr = "0"; updateAmountDisplay();
             document.getElementById('keypad-title').innerText = "SALE QR PAYMENT";
@@ -469,7 +492,6 @@
             }
         }
 
-        // ================= QR SALE LOGIC =================
         function startCountdown() {
             let timeLeft = 300;
             if (countdownTimer) clearInterval(countdownTimer);
@@ -494,6 +516,9 @@
             switchScreen('screen-qr');
             startCountdown();
 
+            // แทรกโลโก้ Thai QR ไปตรงกลางผ่าน HTML/CSS
+            const centerLogoHtml = `<img src="${thaiQrLogoSrc}" onerror="this.src='${thaiQrLogoFallback}'" class="absolute inset-0 m-auto w-12 h-12 bg-white p-1 rounded-md z-10 shadow-sm border border-gray-100">`;
+
             try {
                 const res = await fetch("/api/create-charge", {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: val })
@@ -503,8 +528,21 @@
 
                 currentChargeId = data.chargeId;
                 const base64QR = `data:image/png;base64,${data.encodedImage}`;
-                document.getElementById('qr-container').innerHTML = `<img src="${base64QR}" class="w-full h-full object-contain rounded-xl">`;
-                document.getElementById('qr-print-img').innerHTML = `<img src="${base64QR}" style="width:40mm; height:40mm; display:block; margin:auto;">`;
+                
+                // สำหรับหน้าจอ UI (ใส่ซ้อนตรงกลาง)
+                document.getElementById('qr-container').innerHTML = `
+                    <img src="${base64QR}" class="w-full h-full object-contain rounded-xl relative z-0">
+                    ${centerLogoHtml}
+                `;
+                
+                // สำหรับหน้าปริ้นท์ (ใช้ Absolute ของ Inline Style เพื่อให้เครื่องปริ้นเข้าใจง่าย)
+                document.getElementById('qr-print-img').innerHTML = `
+                    <div style="position: relative; display: inline-block; width: 40mm; height: 40mm;">
+                        <img src="${base64QR}" style="width: 40mm; height: 40mm; display: block; margin: auto;">
+                        <img src="${thaiQrLogoSrc}" onerror="this.src='${thaiQrLogoFallback}'" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8mm; height: 8mm; background: white; padding: 2px; border-radius: 4px;">
+                    </div>
+                `;
+                
                 pollingInterval = setInterval(() => checkStatus(false), 3000);
             } catch (e) { 
                 clearInterval(countdownTimer);
@@ -530,9 +568,9 @@
             let ref = chargeId.substring(0, 12).toUpperCase();
             let nowStr = new Date().toLocaleString('th-TH');
 
-            let txn = { type: 'QR', amount: amount, trace: trace, ref: ref, dateStr: nowStr };
+            let txn = { type: 'QR', amount: amount, trace: trace, ref: ref, dateStr: nowStr, isVoided: false };
             transactions.push(txn);
-            saveTransactions(); // บันทึกลง Local Storage
+            saveTransactions(); 
             
             showReceipt(txn, false);
         }
@@ -542,15 +580,14 @@
         }
         function verifyTransaction() { checkStatus(true); }
 
-        // ================= CASH SALE LOGIC =================
         function finishCashSale(amount, recv, change) {
             let trace = generateTrace();
             let ref = "CASH" + Math.floor(10000000 + Math.random()*90000000);
             let nowStr = new Date().toLocaleString('th-TH');
             
-            let txn = { type: 'CASH', amount: amount, recv: recv, change: change, trace: trace, ref: ref, dateStr: nowStr };
+            let txn = { type: 'CASH', amount: amount, recv: recv, change: change, trace: trace, ref: ref, dateStr: nowStr, isVoided: false };
             transactions.push(txn);
-            saveTransactions(); // บันทึกลง Local Storage
+            saveTransactions(); 
             
             document.getElementById('change-amount-display').innerText = formatAmount(change);
             document.getElementById('cash-total-ui').innerText = formatAmount(amount);
@@ -560,7 +597,63 @@
             switchScreen('screen-cash-change');
         }
 
-        // ================= RECEIPT & SLIP =================
+        let voidBarcodeBuffer = "";
+        
+        function startVoid() {
+            voidBarcodeBuffer = "";
+            document.getElementById('void-status').innerText = "รอรับข้อมูลแสกน...";
+            document.getElementById('void-status').className = "text-lg font-bold text-slate-400";
+            switchScreen('screen-void');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (!document.getElementById('screen-void').classList.contains('flex')) return;
+
+            if (e.key === 'Enter') {
+                processVoid(voidBarcodeBuffer);
+                voidBarcodeBuffer = ""; 
+            } else {
+                if (e.key.length === 1) { 
+                    voidBarcodeBuffer += e.key;
+                }
+            }
+        });
+
+        function processVoid(barcodeData) {
+            let rawData = barcodeData.trim().toUpperCase();
+            document.getElementById('void-status').innerText = "กำลังตรวจสอบ: " + rawData;
+            document.getElementById('void-status').className = "text-lg font-bold text-blue-500";
+
+            if (!rawData.startsWith('VOID-')) {
+                document.getElementById('void-status').innerText = "บาร์โค้ดไม่ถูกต้อง กรุณาลองใหม่";
+                document.getElementById('void-status').className = "text-lg font-bold text-red-500";
+                return;
+            }
+
+            let traceToVoid = rawData.replace('VOID-', '');
+            let index = transactions.findIndex(t => t.trace === traceToVoid);
+
+            if (index !== -1) {
+                if (transactions[index].isVoided) {
+                    document.getElementById('void-status').innerText = "รายการนี้ถูกยกเลิกไปแล้ว";
+                    document.getElementById('void-status').className = "text-lg font-bold text-orange-500";
+                } else {
+                    transactions[index].isVoided = true;
+                    saveTransactions();
+                    document.getElementById('void-status').innerText = "ยกเลิกรายการสำเร็จ!";
+                    document.getElementById('void-status').className = "text-lg font-bold text-green-500";
+                    
+                    setTimeout(() => {
+                        alert("ยกเลิกรายการ TRACE: " + traceToVoid + " สำเร็จ");
+                        resetToHome();
+                    }, 1500);
+                }
+            } else {
+                document.getElementById('void-status').innerText = "ไม่พบรายการนี้ในระบบ";
+                document.getElementById('void-status').className = "text-lg font-bold text-red-500";
+            }
+        }
+
         function showReceipt(txn, isReprint) {
             document.getElementById('r-amount-display').innerText = formatAmount(txn.amount);
             document.getElementById('r-type-ui').innerText = txn.type;
@@ -582,20 +675,22 @@
             JsBarcode("#void-barcode", `VOID-${txn.trace}`, { format:"CODE128", width:1.2, height:25, displayValue:true, fontSize:10 });
         }
 
-        // ================= HISTORY & REPRINT =================
         function showHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = transactions.length === 0 ? '<div class="text-center text-slate-400 mt-10">ไม่มีรายการ</div>' : '';
             [...transactions].reverse().forEach(t => {
                 let color = t.type === 'QR' ? 'text-blue-600' : 'text-green-600';
+                let voidBadge = t.isVoided ? '<span class="text-red-500 text-[10px] border border-red-500 px-1 rounded ml-2 font-bold">VOIDED</span>' : '';
+                let opacity = t.isVoided ? 'opacity-50' : 'opacity-100';
+                
                 list.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${opacity}">
                         <div class="flex flex-col">
-                            <span class="font-bold ${color}">${t.type}</span>
+                            <div><span class="font-bold ${color}">${t.type}</span>${voidBadge}</div>
                             <span class="text-xs text-slate-400">${t.dateStr}</span>
                             <span class="text-[10px] text-slate-400 font-mono">TRACE: ${t.trace}</span>
                         </div>
-                        <span class="font-bold text-lg text-slate-800">฿${formatAmount(t.amount)}</span>
+                        <span class="font-bold text-lg text-slate-800 ${t.isVoided ? 'line-through' : ''}">฿${formatAmount(t.amount)}</span>
                     </div>`;
             });
             switchScreen('screen-history');
@@ -607,15 +702,18 @@
             [...transactions].reverse().forEach((t, index) => {
                 let color = t.type === 'QR' ? 'text-blue-600' : 'text-green-600';
                 let realIndex = transactions.length - 1 - index;
+                let voidBadge = t.isVoided ? '<span class="text-red-500 text-[10px] border border-red-500 px-1 rounded ml-2 font-bold">VOIDED</span>' : '';
+                let opacity = t.isVoided ? 'opacity-50' : 'opacity-100';
+
                 list.innerHTML += `
-                    <button onclick="triggerReprint(${realIndex})" class="w-full bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center active:bg-slate-100 text-left">
+                    <button onclick="triggerReprint(${realIndex})" class="w-full bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center active:bg-slate-100 text-left ${opacity}">
                         <div class="flex flex-col">
-                            <span class="font-bold ${color}">${t.type}</span>
+                            <div><span class="font-bold ${color}">${t.type}</span>${voidBadge}</div>
                             <span class="text-xs text-slate-400">${t.dateStr}</span>
                             <span class="text-[10px] text-slate-400 font-mono">TRACE: ${t.trace}</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="font-bold text-lg text-slate-800">฿${formatAmount(t.amount)}</span>
+                            <span class="font-bold text-lg text-slate-800 ${t.isVoided ? 'line-through' : ''}">฿${formatAmount(t.amount)}</span>
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         </div>
                     </button>`;
@@ -628,10 +726,10 @@
             showReceipt(txn, true);
         }
 
-        // ================= SETTLEMENT =================
         function showSettlement() {
             let qrCount = 0, qrAmt = 0, cashCount = 0, cashAmt = 0;
             transactions.forEach(t => {
+                if (t.isVoided) return; 
                 if(t.type === 'QR') { qrCount++; qrAmt += t.amount; }
                 else if(t.type === 'CASH') { cashCount++; cashAmt += t.amount; }
             });
@@ -642,7 +740,6 @@
             document.getElementById('sum-cash-amt').innerText = formatAmount(cashAmt);
             document.getElementById('sum-grand-amt').innerText = formatAmount(qrAmt + cashAmt);
             
-            // เตรียมข้อมูลสำหรับปริ้นท์
             document.getElementById('s-date').innerText = new Date().toLocaleString('th-TH');
             document.getElementById('s-qr-count').innerText = qrCount;
             document.getElementById('s-qr-amt').innerText = formatAmount(qrAmt);
@@ -657,7 +754,6 @@
             document.body.classList.add('printing-settlement'); 
             setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('printing-settlement'); }, 500); }, 250);
             
-            // ล้างข้อมูลหลังสรุปยอด (เหมือนตัดยอด EDC)
             setTimeout(() => {
                 if(confirm("ต้องการล้างรายการทั้งหมดหลังปริ้นท์สรุปยอดหรือไม่? (CLEAR BATCH)")) {
                     transactions = [];
@@ -667,7 +763,6 @@
             }, 2000);
         }
 
-        // ================= PRINTING =================
         function printQR() { 
             document.getElementById('p-date-qr').innerText = "Date: " + new Date().toLocaleString('th-TH');
             document.body.classList.add('printing-qr'); 
@@ -679,7 +774,6 @@
             setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('printing-receipt'); }, 500); }, 250);
         }
 
-        // ================= RUN ON START =================
         checkLoginState();
     </script>
 </body>
